@@ -1,15 +1,81 @@
 "use client";
 
-import { UserButton } from "@clerk/nextjs";
+import {
+  OrganizationSwitcher,
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  SignOutButton,
+  useOrganization,
+  UserButton,
+} from "@clerk/nextjs";
+import { Button } from "@/components/ui/button";
+import { SearchInput } from "./search-input";
+import { InviteButton } from "./invite-button";
 
 export const Navbar = () => {
-    return (
-        <div className="flex items-center gap-x-4 p-5 bg-green-500 ">
-            <div className="hidden lg:flex-1 lg:flex bg-yellow-500 ">
-                Search
-            </div>
-            <UserButton />
 
-        </div>
-    )
-}
+    const {organization} = useOrganization();
+
+  return (
+    <div className="w-full px-4 py-3 bg-white border-b flex items-center justify-between">
+      {/* Left: Search on large screens */}
+      <div className="hidden lg:flex w-full max-w-lg">
+        <SearchInput />
+      </div>
+
+      {/* Center: Organization switcher on small screens */}
+      <div className="lg:hidden w-full max-w-sm mx-auto">
+        <OrganizationSwitcher
+          hidePersonal
+          appearance={{
+            elements: {
+              rootBox: {
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                width: "100%",
+              },
+              organizationSwitcherTrigger: {
+                padding: "6px",
+                width: "100%",
+                borderRadius: "8px",
+                border: "1px solid #E5E7EB",
+                justifyContent: "space-between",
+                backgroundColor: "white",
+              },
+            },
+          }}
+        />
+      </div>
+
+      {/* Right side */}
+      <div className="flex items-center gap-2 lg:gap-4">
+        
+        {organization && (
+            <InviteButton />
+        )}
+
+        <SignedOut>
+          <SignInButton>
+            <Button variant="secondary" size="sm">
+              Sign In
+            </Button>
+          </SignInButton>
+        </SignedOut>
+
+        <SignedIn>
+          <SignOutButton>
+            <Button variant="destructive" size="sm">
+              Sign Out
+            </Button>
+          </SignOutButton>
+
+          <div className="ml-2">
+            <UserButton afterSignOutUrl="/" />
+          </div>
+        </SignedIn>
+      </div>
+    </div>
+  );
+};
