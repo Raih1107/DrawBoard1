@@ -10,6 +10,9 @@ import { Overlay } from "./overlay";
 import { Footer } from "./footer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Actions } from "@/components/actions";
+import { useApiMutation } from "@/hooks/use-api-mutation";
+import { api } from "@/convex/_generated/api";
+import { toast } from "sonner";
 
 interface BoardCardProps {
   id: string;
@@ -39,6 +42,27 @@ export const BoardCard = ({
     addSuffix: true,
   });
 
+  const {
+    mutate: onFavoruite,
+    pending: pendingFavoruite
+  }  = useApiMutation(api.board.favourite);
+
+  const {
+    mutate: onUnFavoruite,
+    pending: pendingUnFavoruite
+  } = useApiMutation(api.board.unFavourite);
+
+  const toggleFavourite = () => {
+    if(isFavourite){
+      onUnFavoruite({id, orgId})
+          .catch(() => toast.error("Failed to unfavourite"))
+    } else{
+      onFavoruite({id, orgId})
+          .catch(() => toast.error("Failed to favourite"))
+
+    }
+  };
+
   return (
     <Link href={`/board/${id}`}>
       <div className="group aspect-[100/127] border rounded-lg flex flex-col justify-between overflow-hidden">
@@ -62,8 +86,8 @@ export const BoardCard = ({
           title={title}
           authorLabel={authorLabel}
           createdAtLabel={createdAtLabel}
-          onClick={() => {}}
-          disabled={false}
+          onClick={toggleFavourite}
+          disabled={pendingFavoruite || pendingUnFavoruite}
         />
       </div>
     </Link>

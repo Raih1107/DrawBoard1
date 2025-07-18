@@ -10,17 +10,25 @@ import { EmptySearch } from "./empty-search";
 import { BoardCard } from "./board-card";
 import { NewBoardButton } from "./new-board-button";
 
+
 interface BoardListProps {
   orgId: string;
+  query: {
+    search?: string;
+    favoruites?: string;
+  };
 }
 
-export const BoardList = ({ orgId }: BoardListProps) => {
+export const BoardList = ({ orgId , query }: BoardListProps) => {
   const searchParams = useSearchParams();
 
   const search = searchParams.get("search");
   const favourites = searchParams.get("favourites");
 
-  const data = useQuery(api.boards.get, { orgId });
+  const data = useQuery(api.boards.get, { 
+    orgId, 
+    ...query,
+  });
 
   if (data === undefined) {
     return (
@@ -68,7 +76,7 @@ export const BoardList = ({ orgId }: BoardListProps) => {
             authorName={board.authorName}
             createdAt={board._creationTime}
             orgId={board.orgId}
-            isFavourite={false}
+            isFavourite={board.isfavourite}
           />
         ))}
       </div>
