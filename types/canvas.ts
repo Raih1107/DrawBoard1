@@ -1,5 +1,3 @@
-// /types/canvas.ts
-
 export type Color = {
     r: number;
     g: number;
@@ -7,10 +5,9 @@ export type Color = {
 };
 
 export type Camera = {
-    x : number;
-    y : number;
+    x: number;
+    y: number;
 };
-
 
 export enum LayerType {
     Rectangle,
@@ -18,8 +15,8 @@ export enum LayerType {
     Path,
     Text,
     Note,
-};
-
+    Arrow, // ✅ New
+}
 
 export type RectangleLayer = {
     type: LayerType.Rectangle;
@@ -31,7 +28,6 @@ export type RectangleLayer = {
     value?: string;
 };
 
-
 export type EllipseLayer = {
     type: LayerType.Ellipse;
     x: number;
@@ -42,7 +38,6 @@ export type EllipseLayer = {
     value?: string;
 };
 
-
 export type PathLayer = {
     type: LayerType.Path;
     x: number;
@@ -50,7 +45,7 @@ export type PathLayer = {
     height: number;
     width: number;
     fill: Color;
-    points: number[][];
+    points: number[][]; // [ [x1, y1], [x2, y2], ... ]
     value?: string;
 };
 
@@ -74,6 +69,14 @@ export type NoteLayer = {
     value?: string;
 };
 
+// ✅ New Arrow Layer
+export type ArrowLayer = {
+    type: LayerType.Arrow;
+    start: Point;
+    end: Point;
+    stroke: Color;
+};
+
 export type Point = {
     x: number;
     y: number;
@@ -86,7 +89,6 @@ export type XYWH = {
     width: number;
 };
 
-
 export enum Side {
     Top = 1,
     Bottom = 2,
@@ -94,45 +96,7 @@ export enum Side {
     Right = 8,
 }
 
-
-
-
-
-export type CanvasState = 
-    |   {
-        mode: CanvasMode.None,
-        }
-    |   {
-        mode: CanvasMode.SelectionNet,
-        origin: Point;
-        current?: Point;
-        } 
-    |   {
-        mode: CanvasMode.Translating,
-        current: Point;
-        }
-    |   {
-        mode: CanvasMode.Inserting,
-        layerType: LayerType.Ellipse | LayerType.Rectangle | LayerType.Text | LayerType.Note;
-        }
-    |   {
-        mode: CanvasMode.Pencil,
-        }
-    |   {
-        mode: CanvasMode.Pressing,
-        origin: Point;
-        } 
-    |   {
-        mode: CanvasMode.Resizing,
-        initialBounds: XYWH;
-        corner: Side;
-    };
-
-
-
-
-
-
+// ✅ CanvasMode now includes Eraser
 export enum CanvasMode {
     None,
     Pressing,
@@ -141,6 +105,25 @@ export enum CanvasMode {
     Inserting,
     Resizing,
     Pencil,
+    Eraser, // ✅ New
 }
 
+// ✅ CanvasState updated to allow Eraser
+export type CanvasState =
+    | { mode: CanvasMode.None }
+    | { mode: CanvasMode.SelectionNet; origin: Point; current?: Point }
+    | { mode: CanvasMode.Translating; current: Point }
+    | { mode: CanvasMode.Inserting; layerType: LayerType; }
+    | { mode: CanvasMode.Pencil }
+    | { mode: CanvasMode.Pressing; origin: Point }
+    | { mode: CanvasMode.Resizing; initialBounds: XYWH; corner: Side }
+    | { mode: CanvasMode.Eraser }; // ✅ New
 
+// ✅ Optional: Unified Layer type if needed
+export type Layer =
+    | RectangleLayer
+    | EllipseLayer
+    | PathLayer
+    | TextLayer
+    | NoteLayer
+    | ArrowLayer;

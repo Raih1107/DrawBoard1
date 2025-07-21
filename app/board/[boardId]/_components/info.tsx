@@ -57,9 +57,9 @@ export const Info = ({
 
 
     return(
-        <div className="absolute top-2 left-2 bg-white rounded-md px-1.5 h-12 flex items-center shadow-md">
+        <div className="absolute bottom-2 left-0 sm:left-1 bg-white rounded-md px-0 sm:px-1.5 sm:h-12 flex items-center shadow-md">
             <Hint label="Go to boards" side="bottom" sideOffset={10}>
-                <Button asChild variant="board" className="px-2">
+                <Button asChild variant="board" className="px-0.5 sm:px-2">
                 <Link href="/">
                 <Image 
                     src="/logo1.svg"
@@ -68,7 +68,7 @@ export const Info = ({
                     width={40}
                 />
                 <span className={cn(
-                    "font-semibold text-xl ml-2 text-black",
+                    "sm:font-semibold sm:text-xl sm:ml-2 text-black",
                     font.className,
                 )}>
                     Board
@@ -82,7 +82,7 @@ export const Info = ({
             <Hint label="Edit title" side="bottom" sideOffset={10}>
                 <Button 
                     variant="board" 
-                    className="text-base font-normal px-2"
+                    className="text-base font-normal p-0 sm:px-2"
                     onClick={() => onOpen(data._id, data.title)}
                     >
                     {data.title}
