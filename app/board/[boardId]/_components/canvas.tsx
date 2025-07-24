@@ -9,7 +9,7 @@ import { Toolbar } from "./toolbar";
 import { Camera, CanvasMode, Color, LayerType, Point, Side, XYWH } from "@/types/canvas";
 import { useCanRedo, useCanUndo, useHistory, useMutation, useOthersMapped, useStorage} from "@liveblocks/react";
 import { CursorsPresence } from "./cursors-presence";
-import { connectionIdToColor, findIntersectingLayersWithRect, pointerEventToCanvasPoint, resizeBounds } from "@/lib/utils";
+import { connectionIdToColor, findIntersectingLayersWithRect, penPointsToPathLayer, pointerEventToCanvasPoint, resizeBounds } from "@/lib/utils";
 import { LiveObject } from "@liveblocks/client";
 import { LayerPreview } from "./LayerPreview";
 import { SelectionBox } from "./selection-box";
@@ -151,7 +151,63 @@ export const Canvas = ({
             })
         }
 
+    }, []);
+
+    const continueDrawing = useMutation((
+        {self, setMyPresence},
+        point: Point,
+        e: React.PointerEvent,
+    ) => {
+        const {pencilDraft} = self.presence;
+
+        if(canvasState.mode !== CanvasMode.Pencil || e.buttons !== 1 || pencilDraft == null){
+            return;
+        }
+
+        setMyPresence({
+            cursor: point,
+            pencilDraft:pencilDraft.length === 1 && 
+            pencilDraft[0][0] == point.x &&
+            pencilDraft[0][1] === point.y
+                ? pencilDraft
+                :  [...pencilDraft, [point.x, point.y, e.pressure]],
+        })
+
+    }, [canvasState.mode]);
+
+
+    const insertPath = useMutation((
+        {storage, self, setMyPresence}
+    ) => {
+
+        const liveLayers = storage.get("layers");
+        const { pencilDraft } = self.presence;
+        
+        if( pencilDraft == null || pencilDraft.length < 2 || liveLayers.size >= MAX_LAYERS){
+            setMyPresence({pencilDraft : null})
+            return;
+        }
+
+        const id = nanoid();
+        liveLayers.set(
+            id,
+            new LiveObject(penPointsToPathLayer())
+        )
+
     }, [])
+
+    const startDrawing = useMutation((
+        {setMyPresence},
+        point: Point,
+        pressure: number,
+    ) => {
+
+        setMyPresence({
+            pencilDraft: [[point.x, point.y, pressure]],
+            penColor: lastUsedColor,
+        })
+
+    }, [lastUsedColor]);
 
     const resizeSelectedLayer = useMutation((
         {storage, self},
@@ -225,10 +281,12 @@ export const Canvas = ({
 
         } else if (canvasState.mode === CanvasMode.Resizing) {
             resizeSelectedLayer(current);
+        } else if (canvasState.mode === CanvasMode.Pencil) {
+            continueDrawing(current, e);
         }
 
         setMyPresence({cursor: current});
-    }, [canvasState, resizeSelectedLayer, camera]);
+    }, [continueDrawing , startMultiSelection, updateSelectionNet, canvasState, resizeSelectedLayer, camera]);
 
 
     const onPointerLeave = useMutation(({setMyPresence}) => {
@@ -245,10 +303,18 @@ export const Canvas = ({
             return;
         }
 
+        if(canvasState.mode === CanvasMode.Pencil) {
+            startDrawing(point, e.pressure);
+            return;
+        }
+
         
         setCanvasState({origin: point, mode: CanvasMode.Pressing});
 
     }, [camera, canvasState.mode, setCanvasState]) ;
+
+
+
 
     const onPointerUp = useMutation((
         {},
@@ -263,7 +329,11 @@ export const Canvas = ({
             setCanvasState({
                 mode: CanvasMode.None,
             });
-        } else if(canvasState.mode === CanvasMode.Inserting){
+        } else if (canvasState.mode === CanvasMode.Pencil){
+            insertPath();
+        } 
+        
+        else if(canvasState.mode === CanvasMode.Inserting){
             insertLayer(canvasState.layerType, point);
         } else{
             setCanvasState({
@@ -273,11 +343,13 @@ export const Canvas = ({
 
         history.resume();
     }, [
+        setCanvasState,
         camera,
         canvasState,
         history,
         insertLayer,
         unselectLayers,
+        insertPath,
 
     ]);
 
@@ -323,7 +395,9 @@ export const Canvas = ({
         }
 
         return layerIdsToColorSelection;
-    }, [selections])
+    }, [selections]);
+
+    
 
 
     return(

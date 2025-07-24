@@ -112,16 +112,16 @@ export const Toolbar = ({
           canvasState.layerType === LayerType.Ellipse
         } />
         <ToolButton label="Pen(6)" icon={Pencil} onClick={() => setCanvasState({ mode: CanvasMode.Pencil })} isActive={canvasState.mode === CanvasMode.Pencil} />
-        <ToolButton label="Arrow(7)" icon={ArrowUpRightFromCircle} onClick={() => setCanvasState({ mode: CanvasMode.Inserting, layerType: LayerType.Arrow })} isActive={
+        {/* <ToolButton label="Arrow(7)" icon={ArrowUpRightFromCircle} onClick={() => setCanvasState({ mode: CanvasMode.Inserting, layerType: LayerType.Arrow })} isActive={
           canvasState.mode === CanvasMode.Inserting &&
           canvasState.layerType === LayerType.Arrow
-        } />
-        <ToolButton label="Eraser(8)" icon={Eraser} onClick={() => setCanvasState({ mode: CanvasMode.Eraser })} isActive={canvasState.mode === CanvasMode.Eraser} />
+        } /> */}
+        {/* <ToolButton label="Eraser(8)" icon={Eraser} onClick={() => setCanvasState({ mode: CanvasMode.Eraser })} isActive={canvasState.mode === CanvasMode.Eraser} /> */}
       </div>
 
       <div className="bg-white rounded-md px-1 py-1 flex items-center shadow-md space-x-1 sm:space-x-2">
-        <ToolButton label="Undo(9)" icon={Undo} onClick={undo} isDisabled={!canUndo} />
-        <ToolButton label="Redo(0)" icon={Redo2} onClick={redo} isDisabled={!canRedo} />
+        <ToolButton label="Undo(8)" icon={Undo} onClick={undo} isDisabled={!canUndo} />
+        <ToolButton label="Redo(9)" icon={Redo2} onClick={redo} isDisabled={!canRedo} />
       </div>
     </div>
   );

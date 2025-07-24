@@ -2,7 +2,7 @@
 // https://liveblocks.io/docs/api-reference/liveblocks-react#Typing-your-data
 
 import { createClient, LiveList, LiveMap, LiveObject } from "@liveblocks/client";
-import { Layer } from "./types/canvas";
+import { Color, Layer } from "./types/canvas";
 
 const client = createClient({
   throttle: 16,
@@ -16,6 +16,8 @@ declare global {
       // Example, real-time cursor coordinates
       cursor: { x: number; y: number } | null,
       selection: string[];
+      pencilDraft: [x: number, y: number, pressure:number] [] | null;
+      penColor: Color | null;
       
     };
 
