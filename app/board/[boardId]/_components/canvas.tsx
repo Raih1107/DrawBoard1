@@ -401,7 +401,7 @@ export const Canvas = ({
 
 
     return(
-        <main className="h-full w-full relative bg-neutral-100 touch-none">
+        <main className="h-full w-full relative bg-[#BBCEA8] touch-none">
             <Info boardId={boardId} />
             <Participants />
             <Toolbar 
