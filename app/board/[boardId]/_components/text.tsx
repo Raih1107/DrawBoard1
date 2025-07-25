@@ -24,7 +24,7 @@ interface TextProps {
 
 const calculateFontSize = (width: number, height: number) => {
     const maxFontSize = 96;
-    const scaleFactor = 0.5;
+    const scaleFactor = 0.2;
     const fontSizeBasedOnHeight = height * scaleFactor ;
     const fontSizeBasedOnWidth = width * scaleFactor ;
 
@@ -69,12 +69,12 @@ export const Text = ({
                 html={value ||"Text"}
                 onChange={handleContentChange}
                 className={cn(
-                    "h-full w-full flex items-center justify-center text-center drop-shadow-md outline-none",
+                    "h-full w-full flex flex-col items-center justify-center text-center drop-shadow-md outline-none",
                     font.className
                 )}
                 style={{
                     fontSize: calculateFontSize(width,height),
-                    color: fill ? colorToCss(fill) : "#000",
+                    color: fill ? colorToCss(fill) : "#FFF",
                 }}
             />
         </foreignObject>

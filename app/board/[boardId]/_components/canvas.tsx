@@ -2,19 +2,21 @@
 
 
 import { nanoid } from "nanoid";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Info } from "./info";
 import { Participants } from "./participants";
 import { Toolbar } from "./toolbar";
 import { Camera, CanvasMode, Color, LayerType, Point, Side, XYWH } from "@/types/canvas";
-import { useCanRedo, useCanUndo, useHistory, useMutation, useOthersMapped, useStorage} from "@liveblocks/react";
+import { useCanRedo, useCanUndo, useHistory, useMutation, useOthersMapped, useSelf, useStorage} from "@liveblocks/react";
 import { CursorsPresence } from "./cursors-presence";
-import { connectionIdToColor, findIntersectingLayersWithRect, penPointsToPathLayer, pointerEventToCanvasPoint, resizeBounds } from "@/lib/utils";
-import { LiveObject } from "@liveblocks/client";
+import { colorToCss, connectionIdToColor, findIntersectingLayersWithRect, penPointsToPathLayer, pointerEventToCanvasPoint, resizeBounds } from "@/lib/utils";
+import { LiveList, LiveObject } from "@liveblocks/client";
 import { LayerPreview } from "./LayerPreview";
 import { SelectionBox } from "./selection-box";
 import { SelectionTools } from "./selection-tools";
-
+import { Path } from "./path";
+import { useDisableScrollBounce } from "@/hooks/use-disable-scroll-bounce";
+import { useDeleteLayers } from "@/hooks/use-delete-layers";
 
 const MAX_LAYERS = 100;
 
@@ -29,6 +31,8 @@ export const Canvas = ({
 
     const layerIds = useStorage((root) => root.layerIds);
 
+    const pencilDraft = useSelf((me) => me.presence.pencilDraft)
+
     const [canvasState, setCanvasState] = useState<CanvasState>({
         mode:CanvasMode.None,
     });
@@ -40,6 +44,8 @@ export const Canvas = ({
         b:0,
     });
 
+
+    useDisableScrollBounce();
     const history = useHistory();
     const canUndo = useCanUndo();
     const canRedo = useCanRedo();
@@ -190,11 +196,24 @@ export const Canvas = ({
 
         const id = nanoid();
         liveLayers.set(
-            id,
-            new LiveObject(penPointsToPathLayer())
-        )
+        id,
+        new LiveObject(penPointsToPathLayer(
+            pencilDraft,
+            lastUsedColor,
+        )),
+    )
 
-    }, [])
+    const liveLayerIds = storage.get("layerIds");
+    liveLayerIds.push(id);
+
+    setMyPresence({pencilDraft: null});
+    setCanvasState({mode: CanvasMode.Pencil});
+
+    }, [lastUsedColor]);
+
+
+   
+    
 
     const startDrawing = useMutation((
         {setMyPresence},
@@ -397,11 +416,37 @@ export const Canvas = ({
         return layerIdsToColorSelection;
     }, [selections]);
 
-    
+    const deleteLayers = useDeleteLayers();
+
+    useEffect(() => {
+        function onKeyDown(e: KeyboardEvent) {
+            switch (e.key) {
+                case "z" : {
+                    if(e.ctrlKey || e.metaKey){
+                        if(e.shiftKey){
+                            history.redo();
+                        }else{
+                            history.undo();
+                        }
+                break;
+
+                    }
+                }
+
+            }
+        }
+
+        document.addEventListener("keydown", onKeyDown);
+        return() => {
+        document.removeEventListener("keydown", onKeyDown);
+
+        }
+
+    }, [deleteLayers, history])
 
 
     return(
-        <main className="h-full w-full relative bg-[#BBCEA8] touch-none">
+        <main className="h-full w-full relative bg-[#242424] touch-none">
             <Info boardId={boardId} />
             <Participants />
             <Toolbar 
@@ -450,6 +495,14 @@ export const Canvas = ({
                         />
                     )}
                     <CursorsPresence />
+                    {pencilDraft != null && pencilDraft.length > 0 && (
+                        <Path 
+                            points={pencilDraft}
+                            fill={colorToCss(lastUsedColor)}
+                            x={0}
+                            y={0}
+                        />
+                    )}
 
                 </g>
             </svg>

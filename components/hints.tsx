@@ -30,7 +30,7 @@ return(
                 {children}
             </TooltipTrigger>
             <TooltipContent 
-                className="text-white bg-black border-black"
+                className="bg-black text-white  border-black"
                 side={side}
                 align={align}
                 sideOffset={sideOffset}

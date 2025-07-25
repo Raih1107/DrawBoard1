@@ -86,8 +86,8 @@ export const Toolbar = ({
 
 
   return (
-    <div className="absolute top-2 left-1/2 -translate-x-1/2 flex flex-row gap-y-2 z-50">
-      <div className="bg-white rounded-md px-1 py-1 flex gap-y-1 flex-row items-center shadow-md space-x-1 sm:space-x-2 gap-x-1 sm:gap-x-2">
+    <div className=" absolute top-2 left-1/2 -translate-x-1/2 flex flex-row gap-y-2 z-50">
+      <div className="bg-black text-white rounded-md px-1 py-1 flex gap-y-1 flex-row items-center shadow-md space-x-1 sm:space-x-2 gap-x-1 sm:gap-x-2">
         <ToolButton label="Select(1)" icon={MousePointer2} onClick={() => setCanvasState({ mode: CanvasMode.None })} isActive={
           canvasState.mode === CanvasMode.None ||
           canvasState.mode === CanvasMode.Translating ||
@@ -119,7 +119,7 @@ export const Toolbar = ({
         {/* <ToolButton label="Eraser(8)" icon={Eraser} onClick={() => setCanvasState({ mode: CanvasMode.Eraser })} isActive={canvasState.mode === CanvasMode.Eraser} /> */}
       </div>
 
-      <div className="bg-white rounded-md px-1 py-1 flex items-center shadow-md space-x-1 sm:space-x-2">
+      <div className="bg-black text-white rounded-md px-1 py-1 flex items-center shadow-md space-x-1 sm:space-x-2">
         <ToolButton label="Undo(8)" icon={Undo} onClick={undo} isDisabled={!canUndo} />
         <ToolButton label="Redo(9)" icon={Redo2} onClick={redo} isDisabled={!canRedo} />
       </div>

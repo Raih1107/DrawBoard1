@@ -56,7 +56,7 @@ export const Actions = ({
     }
 
     return (
-        <DropdownMenu>
+        <DropdownMenu >
             <DropdownMenuTrigger asChild>
                 {children}
             </DropdownMenuTrigger>
@@ -64,7 +64,7 @@ export const Actions = ({
                 side={side}
                 onClick={(e) => e.stopPropagation()}
                 sideOffset={sideOffset}
-                className="w-60"
+                className="w-60 bg-black text-white border-none"
             >
                 <DropdownMenuItem
                     onClick={onCopyLink}

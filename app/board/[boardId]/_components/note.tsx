@@ -63,7 +63,7 @@ export const Note = ({
             onPointerDown={(e) => onPointerDown(e, id)}
             style={{
                 outline:selectionColor ? `1px solid ${selectionColor}` : "none",
-                backgroundColor: fill ? colorToCss(fill) : "#000",
+                backgroundColor: fill ? colorToCss(fill) : "#FFF",
             }}
             className="shadow-md drop-shadow-xl"
         >
@@ -76,7 +76,7 @@ export const Note = ({
                 )}
                 style={{
                     fontSize: calculateFontSize(width,height),
-                    color: fill ? getConstrastingTextColor(fill) : "#000",
+                    color: fill ? getConstrastingTextColor(fill) : "#FFF",
                 }}
             />
         </foreignObject>
