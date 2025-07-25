@@ -5,19 +5,18 @@ import { EmptyOrg } from "./_components/empty-org";
 import { BoardList } from "./_components/board-list";
 import { useEffect, useState } from "react";
 
-interface DashboardPageProps {
-  searchParams: { [key: string]: string | string[] | undefined };
-}
-
-const DashboardPage = ({ searchParams }: DashboardPageProps) => {
+const DashboardPage = ({
+  searchParams,
+}: {
+  searchParams: Record<string, string | string[] | undefined>;
+}) => {
   const { organization } = useOrganization();
 
-  const search = searchParams.search?.toString();
-  const favourites = searchParams.favourites?.toString();
+  const search = searchParams?.search?.toString();
+  const favourites = searchParams?.favourites?.toString();
 
   const [orgReady, setOrgReady] = useState(false);
 
-  // Optional: wait for Clerk hydration
   useEffect(() => {
     if (organization !== undefined) {
       setOrgReady(true);
