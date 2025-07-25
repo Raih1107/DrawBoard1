@@ -1,9 +1,4 @@
-import dynamic from "next/dynamic";
-
-// Dynamically import the client component
-const DashboardPageClient = dynamic(() => import("./dashboard-page-client"), {
-  ssr: false,
-});
+import DashboardPageClient from "./dashboard-page-client";
 
 export default function DashboardPage({
   searchParams,
