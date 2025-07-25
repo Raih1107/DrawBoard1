@@ -1,9 +1,14 @@
-import DashboardPageClient from "./dashboard-page-client";
+import dynamic from "next/dynamic";
 
-interface DashboardPageProps {
-  searchParams: { [key: string]: string | string[] | undefined };
-}
+// Dynamically import the client component
+const DashboardPageClient = dynamic(() => import("./dashboard-page-client"), {
+  ssr: false,
+});
 
-export default function DashboardPage({ searchParams }: DashboardPageProps) {
+export default function DashboardPage({
+  searchParams,
+}: {
+  searchParams?: { [key: string]: string | string[] };
+}) {
   return <DashboardPageClient searchParams={searchParams} />;
 }
