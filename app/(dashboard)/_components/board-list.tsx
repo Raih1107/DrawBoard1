@@ -15,7 +15,7 @@ interface BoardListProps {
   orgId: string;
   query: {
     search?: string;
-    favoruites?: string;
+    favourites?: string; // ✅ Correct spelling
   };
 }
 
