@@ -1,15 +1,19 @@
-// app/(dashboard)/page.tsx
+import dynamic from "next/dynamic";
+
+const DashboardClient = dynamic(() => import("./dashboard-page-client"), {
+  ssr: false,
+});
 
 interface DashboardPageProps {
-  searchParams?: { [key: string]: string | string[] };
+  // ✅ remove this type
+  // searchParams?: { [key: string]: string | string[] };
+  // ✅ use this instead:
+  searchParams?: Record<string, string | string[]>;
 }
 
-export default function DashboardPage({ searchParams }: DashboardPageProps) {
-  const view = Array.isArray(searchParams?.view) ? searchParams.view[0] : searchParams?.view ?? "default";
+// ✅ mark as async (optional based on use)
+const DashboardPage = ({ searchParams }: DashboardPageProps) => {
+  return <DashboardClient searchParams={searchParams} />;
+};
 
-  return (
-    <main>
-      <h1>Dashboard View: {view}</h1>
-    </main>
-  );
-}
+export default DashboardPage;
