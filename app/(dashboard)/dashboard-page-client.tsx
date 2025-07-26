@@ -1,35 +1,18 @@
 "use client";
 
 import { useOrganization } from "@clerk/nextjs";
-import { EmptyOrg } from "./_components/empty-org";
-import { BoardList } from "./_components/board-list";
-import { useEffect, useState } from "react";
+import { EmptyOrg } from "../(dashboard)/_components/empty-org";
+import { BoardList } from "../(dashboard)/_components/board-list";
 
-interface DashboardPageClientProps {
+interface DashboardClientProps {
   searchParams?: { [key: string]: string | string[] };
 }
 
-const DashboardPageClient = ({ searchParams = {} }: DashboardPageClientProps) => {
+export default function DashboardClient({ searchParams }: DashboardClientProps) {
   const { organization } = useOrganization();
 
-  const search = searchParams.search?.toString();
-  const favourites = searchParams.favourites?.toString();
-
-  const [orgReady, setOrgReady] = useState(false);
-
-  useEffect(() => {
-    if (organization !== undefined) {
-      setOrgReady(true);
-    }
-  }, [organization]);
-
-  if (!orgReady) {
-    return (
-      <div className="flex-1 h-[calc(100%-60px)] p-6 flex items-center justify-center text-muted-foreground">
-        Loading organization...
-      </div>
-    );
-  }
+  const search = searchParams?.search?.toString();
+  const favourites = searchParams?.favourites?.toString();
 
   return (
     <div className="flex-1 h-[calc(100%-60px)] p-6">
@@ -40,6 +23,4 @@ const DashboardPageClient = ({ searchParams = {} }: DashboardPageClientProps) =>
       )}
     </div>
   );
-};
-
-export default DashboardPageClient;
+}
