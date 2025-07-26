@@ -1,16 +1,32 @@
-import DashboardPageClient from "./dashboard-page-client";
-import { type Metadata } from "next";
+"use client";
 
-// (Optional) Add metadata if needed
-export const metadata: Metadata = {
-  title: "Dashboard",
-  description: "Your organization boards",
+import { useOrganization } from "@clerk/nextjs";
+import { EmptyOrg } from "./_components/empty-org";
+import { BoardList } from "./_components/board-list";
+
+// ✅ No need to define a PageProps type if you're in a client component
+const DashboardPage = ({
+  searchParams,
+}: {
+  searchParams?: { [key: string]: string | string[] };
+}) => {
+  const { organization } = useOrganization();
+
+  const search = searchParams?.search?.toString();
+  const favourites = searchParams?.favourites?.toString();
+
+  return (
+    <div className="flex-1 h-[calc(100%-60px)] p-6">
+      {!organization ? (
+        <EmptyOrg />
+      ) : (
+        <BoardList
+          orgId={organization.id}
+          query={{ search, favourites }}
+        />
+      )}
+    </div>
+  );
 };
 
-interface PageProps {
-  searchParams?: Record<string, string | string[]>;
-}
-
-export default function DashboardPage({ searchParams }: PageProps) {
-  return <DashboardPageClient searchParams={searchParams} />;
-}
+export default DashboardPage;
