@@ -1,9 +1,4 @@
-import dynamic from "next/dynamic";
-
-// Dynamically import the client component
-const DashboardClient = dynamic(() => import("../(dashboard)/dashboard-page-client"), {
-  ssr: false,
-});
+import DashboardClient from "../(dashboard)/dashboard-page-client";
 
 interface DashboardPageProps {
   searchParams?: { [key: string]: string | string[] };
