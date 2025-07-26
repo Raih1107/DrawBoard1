@@ -1,10 +1,15 @@
-import DashboardClient from "../(dashboard)/dashboard-page-client";
+// app/(dashboard)/page.tsx
 
 interface DashboardPageProps {
   searchParams?: { [key: string]: string | string[] };
 }
 
-// ✅ Fix: Make the function `async` ONLY if you're using any async calls (you are NOT, so don't)
 export default function DashboardPage({ searchParams }: DashboardPageProps) {
-  return <DashboardClient searchParams={searchParams} />;
+  const view = Array.isArray(searchParams?.view) ? searchParams.view[0] : searchParams?.view ?? "default";
+
+  return (
+    <main>
+      <h1>Dashboard View: {view}</h1>
+    </main>
+  );
 }
