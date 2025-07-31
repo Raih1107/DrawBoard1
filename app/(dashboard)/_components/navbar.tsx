@@ -59,9 +59,9 @@ export const Navbar = () => {
 
         <SignedOut>
           <SignInButton>
-            <Button variant="secondary" size="sm">
-              Sign In
-            </Button>
+            <Button className="bg-zinc-900 text-white hover:bg-zinc-800 transition" size="sm" >
+              Sign in
+            </Button>  
           </SignInButton>
         </SignedOut>
 

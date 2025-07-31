@@ -22,10 +22,13 @@ export const EmptyOrg = () => {
             <div className="mt-6">
                 <Dialog>
                     <DialogTrigger asChild>
-                        <Button size="lg">
-                            Create an organization
+                        <Button
+  className="bg-gray-700 text-white border border-gray-300 hover:bg-gray-100 shadow-sm"
+  size="lg"
+>
+  Create an organization
+</Button>
 
-                        </Button>
                     </DialogTrigger>
                     <DialogContent className="p-0 bg-transparent border-none max-w-[480px]">
                         <CreateOrganization />
