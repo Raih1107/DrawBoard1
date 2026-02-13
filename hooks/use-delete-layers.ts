@@ -1,27 +1,25 @@
 import { useMutation, useSelf } from "@liveblocks/react"
 
-
-
-
 export const useDeleteLayers = () => {
     const selection = useSelf((me) => me.presence.selection);
 
     return useMutation((
-        {storage, setMyPresence}
+        { storage, setMyPresence }
     ) => {
         const liveLayers = storage.get("layers");
         const liveLayerIds = storage.get("layerIds");
 
-        for(const id of selection) {
+        // Use the nullish coalescing operator (??) to provide an empty array fallback
+        for (const id of selection ?? []) {
             liveLayers.delete(id);
 
             const index = liveLayerIds.indexOf(id);
 
-            if(index !== -1) {
+            if (index !== -1) {
                 liveLayerIds.delete(index);
             }
         }
 
-        setMyPresence({selection: []} , { addToHistory: true})
+        setMyPresence({ selection: [] }, { addToHistory: true })
     }, [selection])
 }
