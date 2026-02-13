@@ -12,14 +12,11 @@ import { NewBoardButton } from "./new-board-button";
 
 
 interface BoardListProps {
-  orgId: string;
-  query: {
-    search?: string;
-    favoruites?: string;
-  };
+  orgId : string;
+
 }
 
-export const BoardList = ({ orgId , query }: BoardListProps) => {
+export const BoardList = ({ orgId  }: BoardListProps) => {
   const searchParams = useSearchParams();
 
   const search = searchParams.get("search");
@@ -27,7 +24,8 @@ export const BoardList = ({ orgId , query }: BoardListProps) => {
 
   const data = useQuery(api.boards.get, { 
     orgId, 
-    ...query,
+      search: search ?? undefined,
+      favourites: favourites ?? undefined,
   });
 
   if (data === undefined) {
@@ -76,7 +74,7 @@ export const BoardList = ({ orgId , query }: BoardListProps) => {
             authorName={board.authorName}
             createdAt={board._creationTime}
             orgId={board.orgId}
-            isFavourite={board.isfavourite}
+            isFavourite={board.isFavourite}
           />
         ))}
       </div>

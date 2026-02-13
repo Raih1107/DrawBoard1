@@ -35,9 +35,9 @@ export const get = query({
 
                 const boards = await getAllOrThrow(ctx.db, ids);
                 
-                return boards.map((boards) => ({
-                    ...boards,
-                    isFavoruite: true,
+                return boards.map((board) => ({
+                    ...board,
+                    isFavourite: true,
                 }));
 
         }
@@ -77,7 +77,7 @@ export const get = query({
                 .then((favourite) => {
                     return {
                         ...board,
-                        isfavourite: !!favourite,
+                        isFavourite: !!favourite,
 
                     };
                 });
