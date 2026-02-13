@@ -34,8 +34,8 @@ export const Canvas = ({
     const pencilDraft = useSelf((me) => me.presence.pencilDraft)
 
     const [canvasState, setCanvasState] = useState<CanvasState>({
-        mode:CanvasMode.None,
-    });
+    mode: CanvasMode.None,
+} as CanvasState);
 
     const [camera, setCamera] = useState<Camera>({ x : 0, y : 0});
     const [lastUsedColor, setLastUsedColor] = useState<Color>({
