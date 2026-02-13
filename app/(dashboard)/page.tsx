@@ -27,7 +27,7 @@ const DashboardContent = () => {
     <div className="flex-1 h-[calc(100%-60px)] p-6">
       <BoardList 
         orgId={organization.id} 
-        
+        query={{ search, favorites }}
       />
     </div>
   );

@@ -10,22 +10,24 @@ import { EmptySearch } from "./empty-search";
 import { BoardCard } from "./board-card";
 import { NewBoardButton } from "./new-board-button";
 
-
 interface BoardListProps {
-  orgId : string;
-
+  orgId: string;
+  query: {
+    search?: string;
+    favorites?: string;
+  };
 }
 
-export const BoardList = ({ orgId  }: BoardListProps) => {
-  const searchParams = useSearchParams();
-
-  const search = searchParams.get("search");
-  const favourites = searchParams.get("favourites");
+export const BoardList = ({ orgId, query }: BoardListProps) => {
+  // const searchParams = useSearchParams(); <--- REMOVE THIS
+  
+  const search = query.search;
+  const favourites = query.favorites;
 
   const data = useQuery(api.boards.get, { 
     orgId, 
-      search: search ?? undefined,
-      favourites: favourites ?? undefined,
+    search: search || undefined,
+    favourites: favourites || undefined,
   });
 
   if (data === undefined) {
