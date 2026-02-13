@@ -1,16 +1,16 @@
 "use client";
 
 import { useOrganization } from "@clerk/nextjs";
-import { useSearchParams } from "next/navigation"; // Import this
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react"; // 1. Import Suspense
 import { EmptyOrg } from "./_components/empty-org";
 import { BoardList } from "./_components/board-list";
 
-const DashboardPage = () => {
+// 2. Move your logic into a separate internal component
+const DashboardContent = () => {
   const { organization } = useOrganization();
   const searchParams = useSearchParams();
 
-  // Extract the values from the URL hook
-  // This is reactive and will update when the URL changes
   const search = searchParams.get("search") || undefined;
   const favourites = searchParams.get("favourites") || undefined;
 
@@ -21,13 +21,19 @@ const DashboardPage = () => {
       ) : (
         <BoardList 
           orgId={organization.id} 
-          // We pass the search/favourites if your BoardList still expects a query prop,
-          // though based on our previous fix, BoardList can also read these itself!
-        //🔥🔥🔥
-        //   query={{ search, favourites }} 
+          // query={{ search, favourites }} 
         />
       )}
     </div>
+  );
+};
+
+// 3. The main page component now just wraps the content in Suspense
+const DashboardPage = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <DashboardContent />
+    </Suspense>
   );
 };
 
