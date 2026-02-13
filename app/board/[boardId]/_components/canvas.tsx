@@ -334,43 +334,44 @@ export const Canvas = ({
 
 
 
+const onPointerUp = useMutation((
+    { storage }, // Add storage to the destructured arguments here
+    e: React.PointerEvent
+) => {
+    // 1. Add this Guard Clause
+    // If storage is not loaded, do nothing to avoid the crash
+    if (!storage) return; 
 
-    const onPointerUp = useMutation((
-        {},
-        e
-    ) => {
-        const point = pointerEventToCanvasPoint(e, camera);
+    const point = pointerEventToCanvasPoint(e, camera);
 
-        if(canvasState.mode === CanvasMode.None || 
-            canvasState.mode === CanvasMode.Pressing
-        ) {
-            unselectLayers();
-            setCanvasState({
-                mode: CanvasMode.None,
-            });
-        } else if (canvasState.mode === CanvasMode.Pencil){
-            insertPath();
-        } 
-        
-        else if(canvasState.mode === CanvasMode.Inserting){
-            insertLayer(canvasState.layerType, point);
-        } else{
-            setCanvasState({
-                mode: CanvasMode.None,
-            });
-        }
+    if (canvasState.mode === CanvasMode.None || 
+        canvasState.mode === CanvasMode.Pressing
+    ) {
+        unselectLayers();
+        setCanvasState({
+            mode: CanvasMode.None,
+        });
+    } else if (canvasState.mode === CanvasMode.Pencil){
+        insertPath();
+    } 
+    else if (canvasState.mode === CanvasMode.Inserting){
+        insertLayer(canvasState.layerType, point);
+    } else {
+        setCanvasState({
+            mode: CanvasMode.None,
+        });
+    }
 
-        history.resume();
-    }, [
-        setCanvasState,
-        camera,
-        canvasState,
-        history,
-        insertLayer,
-        unselectLayers,
-        insertPath,
-
-    ]);
+    history.resume();
+}, [
+    setCanvasState,
+    camera,
+    canvasState,
+    history,
+    insertLayer,
+    unselectLayers,
+    insertPath,
+]);
 
     const onLayerPointerDown = useMutation((
         {self , setMyPresence},
