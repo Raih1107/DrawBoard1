@@ -2,36 +2,41 @@
 
 import { useOrganization } from "@clerk/nextjs";
 import { useSearchParams } from "next/navigation";
-import { Suspense } from "react"; // 1. Added Suspense
+import { Suspense } from "react";
 import { EmptyOrg } from "./_components/empty-org";
 import { BoardList } from "./_components/board-list";
 
-// This is the component that uses the search hook
 const DashboardContent = () => {
   const { organization } = useOrganization();
   const searchParams = useSearchParams();
 
-  const search = searchParams.get("search") || undefined;
-  const favorites = searchParams.get("favorites") || undefined;
+  // Next.js 15 can be picky about 'undefined' vs 'null' vs '' 
+  // during prerendering. Using || "" is the safest bet.
+  const search = searchParams.get("search") || "";
+  const favorites = searchParams.get("favorites") || "";
+
+  if (!organization) {
+    return (
+      <div className="flex-1 h-[calc(100%-60px)] p-6">
+        <EmptyOrg />
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 h-[calc(100%-60px)] p-6">
-      {!organization ? (
-        <EmptyOrg />
-      ) : (
-        <BoardList 
-          orgId={organization.id} 
-          
-        />
-      )}
+      <BoardList 
+        orgId={organization.id} 
+        
+      />
     </div>
   );
 };
 
-// This is the actual page export that Next.js sees
 const DashboardPage = () => {
   return (
-    // The Suspense boundary MUST be outside DashboardContent
+    // Ensure Suspense is the ONLY thing returned at the top level 
+    // to force Next.js to treat the children as purely dynamic.
     <Suspense fallback={<div className="flex-1 p-6">Loading...</div>}>
       <DashboardContent />
     </Suspense>
