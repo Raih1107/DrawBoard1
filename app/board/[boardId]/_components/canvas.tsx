@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Info } from "./info";
 import { Participants } from "./participants";
 import { Toolbar } from "./toolbar";
-import { Camera, CanvasMode, Color, LayerType, Point, Side, XYWH } from "@/types/canvas";
+import { Camera, CanvasMode,CanvasState, Color, LayerType, Point, Side, XYWH } from "@/types/canvas";
 import { useCanRedo, useCanUndo, useHistory, useMutation, useOthersMapped, useSelf, useStorage} from "@liveblocks/react";
 import { CursorsPresence } from "./cursors-presence";
 import { colorToCss, connectionIdToColor, findIntersectingLayersWithRect, penPointsToPathLayer, pointerEventToCanvasPoint, resizeBounds } from "@/lib/utils";
@@ -35,7 +35,7 @@ export const Canvas = ({
 
     const [canvasState, setCanvasState] = useState<CanvasState>({
     mode: CanvasMode.None,
-} as CanvasState);
+} as any);
 
     const [camera, setCamera] = useState<Camera>({ x : 0, y : 0});
     const [lastUsedColor, setLastUsedColor] = useState<Color>({
