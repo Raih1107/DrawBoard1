@@ -2,7 +2,6 @@ import { Camera, Color, Layer, LayerType, PathLayer, Point, Side, XYWH } from "@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
-
 const COLORS = [
   "#DC2626",
   "#D97706", 
@@ -11,16 +10,13 @@ const COLORS = [
   "#DB2777"
 ]
 
-
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-
 export function connectionIdToColor(connectionId: number) : string {
   return COLORS[connectionId % COLORS.length];
 }
-
 
 export function pointerEventToCanvasPoint(
   e: React.PointerEvent,
@@ -28,15 +24,12 @@ export function pointerEventToCanvasPoint(
 ) {
   return {
     x: Math.round(e.clientX) - camera.x,
-    y: Math.round(e.clientY) -camera.y,
+    y: Math.round(e.clientY) - camera.y,
   };
 };
 
-
 export function colorToCss(color: Color) {
     return `#${color.r.toString(16).padStart(2, "0")}${color.g.toString(16).padStart(2, "0")}${color.b.toString(16).padStart(2, "0")}`;
-
-
 };
 
 export function resizeBounds(
@@ -52,14 +45,12 @@ export function resizeBounds(
   };
 
   if((corner & Side.Left) === Side.Left){
-    result.x =Math.min(point.x , bounds.x + bounds.width);
+    result.x = Math.min(point.x , bounds.x + bounds.width);
     result.width = Math.abs(bounds.x + bounds.width - point.x);
-
   }
 
-
   if((corner & Side.Right) === Side.Right){
-    result.width = Math.min(point.x , bounds.x);
+    result.x = Math.min(point.x , bounds.x);
     result.width = Math.abs(point.x - bounds.x);
   }
 
@@ -76,8 +67,10 @@ export function resizeBounds(
   return result;
 }
 
-
-
+/**
+ * Updates findIntersectingLayersWithRect to handle strict type checking.
+ * - Uses type casting (as any) to access x, y, width, height on the Layer union.
+ */
 export function findIntersectingLayersWithRect(
   layerIds: readonly string[],
   layers: ReadonlyMap<string, Layer>,
@@ -100,7 +93,9 @@ export function findIntersectingLayersWithRect(
       continue;
     }
 
-    const {x , y, height, width} = layer;
+    // Cast to any to access properties common to most layer types
+    // but potentially missing from specific union members like PathLayer
+    const { x, y, height, width } = layer as any;
 
     if(
       rect.x + rect.width > x &&
@@ -115,14 +110,10 @@ export function findIntersectingLayersWithRect(
   return ids;
 };
 
-
-
 export function getConstrastingTextColor(color: Color){
   const luminance = 0.299 * color.r + 0.587 * color.g + 0.114 * color.b;
-
   return luminance > 182 ? "black" : "white";
 };
-
 
 export function penPointsToPathLayer(
   points: number[][],
@@ -139,35 +130,21 @@ export function penPointsToPathLayer(
 
   for(const point of points){
     const [x, y] = point;
-
-    if(left > x) {
-      left = x;
-    }
-
-    if(top > y){
-      top = y;
-    }
-
-    if(right < x){
-      right = x;
-    }
-
-    if(bottom < y) {
-      bottom = y;
-    }
-
+    if(left > x) left = x;
+    if(top > y) top = y;
+    if(right < x) right = x;
+    if(bottom < y) bottom = y;
   }
 
   return {
-    type:LayerType.Path,
+    type: LayerType.Path,
     x: left,
     y: top,
     width: right - left,
     height: bottom - top,
     fill: color,
-    points: points.map(([x,y,pressure]) => [x - left, y- top, pressure])
+    points: points.map(([x, y, pressure]) => [x - left, y - top, pressure])
   };
-;
 }
 
 export function getSvgPathFromStroke(stroke: number[][]) {

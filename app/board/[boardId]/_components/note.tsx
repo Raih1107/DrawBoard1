@@ -45,7 +45,13 @@ export const Note = ({
         newValue: string,
     ) => {
         const liveLayers = storage.get("layers");
-        liveLayers.get(id)?.set("value", newValue);
+    
+    // Cast the retrieved layer to 'any' so we can set the "value" property
+    const layer = liveLayers.get(id) as any;
+
+    if (layer) {
+        layer.set("value", newValue);
+    }
 
     }, []);
 

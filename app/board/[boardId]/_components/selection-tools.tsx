@@ -38,9 +38,9 @@ export const SelectionTools = memo(({
         const arr = liveLayerIds.toImmutable();
 
         for(let i = 0; i < arr.length; i++){
-            if(selection.includes(arr[i])){
-                indices.push(i);
-            }
+            if ((selection ?? []).includes(arr[i])) {
+    indices.push(i);
+}
         }
 
         for(let i = indices.length - 1; i >= 0; i--) {
@@ -59,9 +59,9 @@ export const SelectionTools = memo(({
         const arr = liveLayerIds.toImmutable();
 
         for(let i = 0; i < arr.length; i++){
-            if(selection.includes(arr[i])){
-                indices.push(i);
-            }
+            if ((selection ?? []).includes(arr[i])) {
+    indices.push(i);
+}
         }
 
         for(let i =0; i < indices.length; i++) {
@@ -77,9 +77,9 @@ export const SelectionTools = memo(({
         const liveLayers = storage.get("layers");
         setLastUsedColor(fill);
 
-        selection.forEach((id) => {
-            liveLayers.get(id)?.set("fill", fill);
-        })
+        (selection ?? []).forEach((id) => {
+    (liveLayers.get(id) as any)?.set("fill", fill);
+});
     }, [selection, setLastUsedColor])
 
     const deleteLayers = useDeleteLayers();
@@ -116,18 +116,18 @@ export const SelectionTools = memo(({
                     <Button
                         onClick={moveToFront} 
                         variant="board"
-                        size="icon`"
+                        size={"icon" as any}
                     >
                         <BringToFront />
 
                     </Button>
                 </Hint>
 
-                <Hint label="Send to back" side="bottom">
+                <Hint label="Send to back" side={"bottom" as any}>
                     <Button
                         onClick={moveToBack} 
                         variant="board"
-                        size="icon`"
+                        size={"icon" as any}
                     >
                         <SendToBack />
 

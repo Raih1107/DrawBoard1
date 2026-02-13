@@ -31,7 +31,7 @@ return(
             </TooltipTrigger>
             <TooltipContent 
                 className="bg-black text-white  border-black"
-                side={side}
+                side={"side" as any}
                 align={align}
                 sideOffset={sideOffset}
                 alignOffset={alignOffset}
