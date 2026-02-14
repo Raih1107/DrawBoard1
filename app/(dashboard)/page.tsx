@@ -13,7 +13,7 @@ const DashboardContent = () => {
   // Next.js 15 can be picky about 'undefined' vs 'null' vs '' 
   // during prerendering. Using || "" is the safest bet.
   const search = searchParams.get("search") || "";
-  const favorites = searchParams.get("favorites") || "";
+  const favourites = searchParams.get("favourites") || "";
 
   if (!organization) {
     return (
@@ -27,7 +27,7 @@ const DashboardContent = () => {
     <div className="flex-1 h-[calc(100%-60px)] p-6">
       <BoardList 
         orgId={organization.id} 
-        query={{ search, favorites }}
+        query={{ search, favourites }}
       />
     </div>
   );

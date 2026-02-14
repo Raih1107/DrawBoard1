@@ -14,7 +14,7 @@ interface BoardListProps {
   orgId: string;
   query: {
     search?: string;
-    favorites?: string;
+    favourites?: string;
   };
 }
 
@@ -22,7 +22,7 @@ export const BoardList = ({ orgId, query }: BoardListProps) => {
   // const searchParams = useSearchParams(); <--- REMOVE THIS
   
   const search = query.search;
-  const favourites = query.favorites;
+  const favourites = query.favourites;
 
   const data = useQuery(api.boards.get, { 
     orgId, 
