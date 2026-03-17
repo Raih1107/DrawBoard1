@@ -61,16 +61,23 @@ export const RenameModal = () => {
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose} >
-            <DialogContent>
+            <DialogContent 
+                className="max-w-[420px] border-none shadow-[0_8px_32px_rgba(0,0,0,0.5)] p-6 rounded-2xl"
+                style={{
+                    background: "rgba(15,17,23,0.9)",
+                    backdropFilter: "blur(20px)",
+                    border: "1px solid rgba(255,255,255,0.08)"
+                }}
+            >
                 <DialogHeader>
-                    <DialogTitle>
+                    <DialogTitle className="text-xl font-semibold text-white">
                         Edit board title
                     </DialogTitle>
                 </DialogHeader>
-                <DialogDescription>
+                <DialogDescription className="text-slate-400">
                     Enter a new title for this board
                 </DialogDescription>
-                <form onSubmit={onSubmit} className="space-y-4">
+                <form onSubmit={onSubmit} className="space-y-6 mt-2">
                     <Input 
                         disabled={pending}
                         required
@@ -79,13 +86,24 @@ export const RenameModal = () => {
                         onChange={(e) => setTitle(e.target.value)}
                         placeholder="Board Title"
                     />
-                    <DialogFooter>
-                    <DialogClose asChild>
-                        <Button type="button" variant="outline">Cancel</Button>
-                    </DialogClose>
-                    <Button disabled={pending} type="submit">Save</Button>
+                    <DialogFooter className="gap-2">
+                        <DialogClose asChild>
+                            <Button 
+                                type="button" 
+                                variant="outline"
+                                className="rounded-xl h-11 px-6 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white transition-all"
+                            >
+                                Cancel
+                            </Button>
+                        </DialogClose>
+                        <Button 
+                            disabled={pending} 
+                            type="submit"
+                            className="bg-indigo-600 hover:bg-indigo-500 text-white border-0 rounded-xl transition-all h-11 px-6 shadow-lg shadow-indigo-500/20"
+                        >
+                            Save changes
+                        </Button>
                     </DialogFooter>
-
                 </form>
             </DialogContent>
         </Dialog>

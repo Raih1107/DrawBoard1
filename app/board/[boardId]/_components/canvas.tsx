@@ -240,8 +240,10 @@ export const Canvas = ({
         setCanvasState({origin: point, mode: CanvasMode.Pressing});
     }, [camera, canvasState.mode]);
 
-    const onPointerUp = useMutation(({ storage }, e: React.PointerEvent) => {
-        if (!storage) return; 
+    const onPointerUp = useMutation((
+        {}, 
+        e: React.PointerEvent
+    ) => {
         const point = pointerEventToCanvasPoint(e, camera);
 
         if (canvasState.mode === CanvasMode.None || canvasState.mode === CanvasMode.Pressing) {
@@ -301,7 +303,14 @@ export const Canvas = ({
     }, [deleteLayers, history]);
 
     return (
-        <main className="h-full w-full relative bg-[#242424] touch-none">
+        <main 
+            className="h-full w-full relative touch-none overflow-hidden"
+            style={{
+                backgroundColor: "#0f1117",
+                backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0)`,
+                backgroundSize: "32px 32px"
+            }}
+        >
             <Info boardId={boardId} />
             <Participants />
             <Toolbar 
@@ -333,7 +342,7 @@ export const Canvas = ({
                     <SelectionBox onResizeHandlePointerDown={onResizeHandlePointerDown} />
                     {canvasState.mode === CanvasMode.SelectionNet && canvasState.current != null && (
                         <rect 
-                            className="fill-blue-500/5 stroke-blue-500 stroke-1"
+                            className="fill-indigo-500/5 stroke-indigo-500 stroke-1"
                             x={Math.min(canvasState.origin.x, canvasState.current.x)}
                             y={Math.min(canvasState.origin.y, canvasState.current.y)}
                             width={Math.abs(canvasState.origin.x - canvasState.current.x)}

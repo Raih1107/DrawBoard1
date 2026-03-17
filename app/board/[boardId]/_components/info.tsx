@@ -9,17 +9,13 @@ import { Id } from "@/convex/_generated/dataModel";
 import { cn } from "@/lib/utils";
 import { useRenameModal } from "@/store/use-rename-modal";
 import { useQuery } from "convex/react";
-import { icons, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Poppins } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 
-
-
-
-
-interface InforProps{
-    boardId:string;
+interface InfoProps {
+    boardId: string;
 };
 
 const font = Poppins({
@@ -27,26 +23,19 @@ const font = Poppins({
     weight: ["600"],
 });
 
-
 const TabSeparator = () => {
-
-
     return(
-        <div className="text-neutral-300 px-1.5">
+        <div className="text-white/20 px-1.5 font-light">
             |
         </div>
     )
 }
 
-
-
-
 export const Info = ({
     boardId,
-}: InforProps) => {
+}: InfoProps) => {
 
     const { onOpen } = useRenameModal();
-
 
     const data = useQuery(api.board.get, {
         id: boardId as Id<"boards">,
@@ -54,68 +43,94 @@ export const Info = ({
 
     if(!data) return <InfoSkeleton />;
 
-
-
     return(
-        <div className="absolute bottom-2 left-0 sm:left-1 bg-black text-white  rounded-md px-0 sm:px-1.5 sm:h-12 flex items-center shadow-md">
-            <Hint label="Go to boards" side={"bottom" as any} sideOffset={10}>
-                <Button asChild variant="board" className="px-0.5 sm:px-2">
-                <Link href="/">
-                <Image 
-                    src="/logo1.svg"
-                    alt="Board logo"
-                    height={40}
-                    width={40}
-                />
-                <span className={cn(
-                    "sm:font-semibold sm:text-xl sm:ml-2 ",
-                    font.className,
-                )}>
-                    Board
-                </span>
-                </Link>
-            
-            </Button>
-
-            </Hint>
-            <TabSeparator />
-            <Hint label="Edit title" side={"bottom" as any} sideOffset={10}>
+        <div 
+            className="absolute bottom-4 left-4 rounded-xl px-1.5 h-12 flex items-center shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
+            style={{
+                background: "rgba(15,17,23,0.85)",
+                backdropFilter: "blur(20px)",
+                border: "1px solid rgba(255,255,255,0.08)"
+            }}
+        >
+            <Hint label="Go to boards" side={"bottom" as any} sideOffset={14}>
                 <Button 
-                    variant="board" 
-                    className="text-base font-normal p-0 sm:px-2"
+                    asChild 
+                    variant="ghost" 
+                    className="px-2 hover:bg-white/10 rounded-lg text-white"
+                >
+                    <Link href="/">
+                        <div className="relative w-7 h-7">
+                            <Image 
+                                src="/logo1.svg"
+                                alt="Board logo"
+                                fill
+                                className="drop-shadow-[0_0_8px_rgba(99,102,241,0.6)] object-contain"
+                            />
+                        </div>
+                        <span className={cn(
+                            "sm:font-semibold sm:text-lg sm:ml-2.5",
+                            font.className,
+                        )}
+                        style={{
+                            background: "linear-gradient(135deg, #818cf8, #a78bfa)",
+                            WebkitBackgroundClip: "text",
+                            WebkitTextFillColor: "transparent",
+                            backgroundClip: "text"
+                        }}
+                        >
+                            Canvasly
+                        </span>
+                    </Link>
+                </Button>
+            </Hint>
+
+            <TabSeparator />
+
+            <Hint label="Edit title" side={"bottom" as any} sideOffset={14}>
+                <Button 
+                    variant="ghost" 
+                    className="text-base font-normal px-3 hover:bg-white/10 rounded-lg text-slate-200"
                     onClick={() => onOpen(data._id, data.title)}
-                    >
+                >
                     {data.title}
                 </Button>
             </Hint>
+
             <TabSeparator />
+
             <Actions
                 id={data._id}
                 title={data.title}
                 side="bottom"
-                sideOffset={10}
+                sideOffset={14}
             >
                 <div>
-                    <Hint label="Main menu" side={"bottom" as any} sideOffset={10}>
-                        <Button size="icon" variant="board">
-                            <Menu />
+                    <Hint label="Main menu" side={"bottom" as any} sideOffset={14}>
+                        <Button 
+                            size="icon" 
+                            variant="ghost"
+                            className="w-10 h-10 hover:bg-white/10 rounded-lg text-slate-200"
+                        >
+                            <Menu className="w-5 h-5" />
                         </Button>
-
                     </Hint>
                 </div>
-
             </Actions>
-
         </div>
     )
 }
 
 export const InfoSkeleton = () => {
     return (
-        <div className="absolute top-2 left-2 bg-white rounded-md px-1.5 h-12 flex items-center shadow-md 
-        w-[300px]">
-            <Skeleton className="h-full w-full bg-muted-400 " />
-
+        <div 
+            className="absolute bottom-4 left-4 rounded-xl px-3 h-12 flex items-center w-[300px] shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
+            style={{
+                background: "rgba(15,17,23,0.8)",
+                backdropFilter: "blur(20px)",
+                border: "1px solid rgba(255,255,255,0.08)"
+            }}
+        >
+            <Skeleton className="h-full w-full bg-white/5 rounded-lg" />
         </div>
     )
 }

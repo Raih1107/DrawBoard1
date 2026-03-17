@@ -59,24 +59,40 @@ export const BoardCard = ({
     } else{
       onFavoruite({id, orgId})
           .catch(() => toast.error("Failed to favourite"))
-
     }
   };
 
   return (
     <Link href={`/board/${id}`}>
-      <div className="group aspect-[100/127] border rounded-lg flex flex-col justify-between overflow-hidden">
-        <div className="relative flex-1 bg-amber-50">
+      <div 
+        className="group aspect-[100/127] rounded-xl flex flex-col justify-between overflow-hidden transition-all duration-300 hover:-translate-y-1"
+        style={{
+          background: "rgba(30,33,48,0.8)",
+          border: "1px solid rgba(255,255,255,0.07)",
+          boxShadow: "0 2px 12px rgba(0,0,0,0.3)"
+        }}
+        onMouseEnter={e => {
+          (e.currentTarget as HTMLDivElement).style.boxShadow = "0 12px 40px rgba(99,102,241,0.18), 0 2px 12px rgba(0,0,0,0.4)";
+          (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(99,102,241,0.25)";
+        }}
+        onMouseLeave={e => {
+          (e.currentTarget as HTMLDivElement).style.boxShadow = "0 2px 12px rgba(0,0,0,0.3)";
+          (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(255,255,255,0.07)";
+        }}
+      >
+        <div className="relative flex-1 bg-slate-800">
           <Image
             src={imageUrl}
             alt={title}
             fill
-            className="object-cover" // more reliable than object-fit
+            className="object-cover"
           />
           <Overlay />
           <Actions id={id} title={title} side="right">
-            <button className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity px-3 py-2 outline-none">
-              <MoreHorizontal className="text-white opacity-75 hover:opacity-100 transition-opacity" />
+            <button className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1.5 outline-none rounded-lg"
+              style={{ background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)" }}
+            >
+              <MoreHorizontal className="text-white w-4 h-4" />
             </button>
           </Actions>
         </div>
@@ -94,11 +110,14 @@ export const BoardCard = ({
   );
 };
 
-// Skeleton variant of the card
+// Skeleton variant
 BoardCard.Skeleton = function BoardCardSkeleton() {
   return (
-    <div className="aspect-[100/127] rounded-lg overflow-hidden">
-      <Skeleton className="h-full w-full" />
+    <div 
+      className="aspect-[100/127] rounded-xl overflow-hidden"
+      style={{ background: "rgba(30,33,48,0.6)", border: "1px solid rgba(255,255,255,0.06)" }}
+    >
+      <Skeleton className="h-full w-full bg-slate-800/50" />
     </div>
   );
 };

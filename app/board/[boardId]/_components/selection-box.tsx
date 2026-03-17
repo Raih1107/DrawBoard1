@@ -32,7 +32,7 @@ export const SelectionBox = memo(({
     return (
         <>
             <rect 
-                className="fill-transparent stroke-blue-500 stroke-1 pointer-events-none"
+                className="fill-transparent stroke-indigo-500 stroke-1 pointer-events-none"
                 style={{
                     transform: `translate(${bounds.x}px, ${bounds.y}px)`
                 }}
@@ -44,9 +44,10 @@ export const SelectionBox = memo(({
             {isShowingHandles && (
                 <>
                     <rect 
-                        className="fill-white stroke-1 stroke-blue-500"
+                        className="fill-white stroke-1 stroke-indigo-500 shadow-sm"
                         x={0}
                         y={0}
+                        rx="2"
                         style={{
                             cursor: "nwse-resize",
                             width: `${HANDLE_WIDTH}px`,
@@ -62,9 +63,10 @@ export const SelectionBox = memo(({
                     />
 
                     <rect 
-                        className="fill-white stroke-1 stroke-blue-500"
+                        className="fill-white stroke-1 stroke-indigo-500 shadow-sm"
                         x={0}
                         y={0}
+                        rx="2"
                         style={{
                             cursor: "ns-resize",
                             width: `${HANDLE_WIDTH}px`,
@@ -81,9 +83,10 @@ export const SelectionBox = memo(({
                     />
 
                     <rect 
-                        className="fill-white stroke-1 stroke-blue-500"
+                        className="fill-white stroke-1 stroke-indigo-500 shadow-sm"
                         x={0}
                         y={0}
+                        rx="2"
                         style={{
                             cursor: "nesw-resize",
                             width: `${HANDLE_WIDTH}px`,
@@ -100,9 +103,10 @@ export const SelectionBox = memo(({
                     />
 
                     <rect 
-                        className="fill-white stroke-1 stroke-blue-500"
+                        className="fill-white stroke-1 stroke-indigo-500 shadow-sm"
                         x={0}
                         y={0}
+                        rx="2"
                         style={{
                             cursor: "ew-resize",
                             width: `${HANDLE_WIDTH}px`,
@@ -118,9 +122,10 @@ export const SelectionBox = memo(({
                         }}
                     />
                     <rect 
-                        className="fill-white stroke-1 stroke-blue-500"
+                        className="fill-white stroke-1 stroke-indigo-500 shadow-sm"
                         x={0}
                         y={0}
+                        rx="2"
                         style={{
                             cursor: "nwse-resize",
                             width: `${HANDLE_WIDTH}px`,
@@ -137,9 +142,10 @@ export const SelectionBox = memo(({
                     />
 
                     <rect 
-                        className="fill-white stroke-1 stroke-blue-500"
+                        className="fill-white stroke-1 stroke-indigo-500 shadow-sm"
                         x={0}
                         y={0}
+                        rx="2"
                         style={{
                             cursor: "ns-resize",
                             width: `${HANDLE_WIDTH}px`,
@@ -155,9 +161,10 @@ export const SelectionBox = memo(({
                     />
 
                     <rect 
-                        className="fill-white stroke-1 stroke-blue-500"
+                        className="fill-white stroke-1 stroke-indigo-500 shadow-sm"
                         x={0}
                         y={0}
+                        rx="2"
                         style={{
                             cursor: "nesw-resize",
                             width: `${HANDLE_WIDTH}px`,
@@ -173,9 +180,10 @@ export const SelectionBox = memo(({
                     />
 
                     <rect 
-                        className="fill-white stroke-1 stroke-blue-500"
+                        className="fill-white stroke-1 stroke-indigo-500 shadow-sm"
                         x={0}
                         y={0}
+                        rx="2"
                         style={{
                             cursor: "ew-resize",
                             width: `${HANDLE_WIDTH}px`,

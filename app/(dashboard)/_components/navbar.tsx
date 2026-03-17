@@ -1,5 +1,5 @@
 "use client";
-
+import { useEffect, useState } from "react";
 import {
   OrganizationSwitcher,
   SignedIn,
@@ -14,11 +14,26 @@ import { SearchInput } from "./search-input";
 import { InviteButton } from "./invite-button";
 
 export const Navbar = () => {
-
+    const [mounted, setMounted] = useState(false);
     const {organization} = useOrganization();
 
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) {
+        return null; // Or a skeleton if preferred
+    }
+
   return (
-    <div className="w-full px-4 py-3 bg-white border-b flex items-center justify-between">
+    <div
+      className="w-full px-4 py-3 flex items-center justify-between"
+      style={{
+        background: "rgba(13,16,23,0.8)",
+        backdropFilter: "blur(16px)",
+        borderBottom: "1px solid rgba(255,255,255,0.05)"
+      }}
+    >
       {/* Left: Search on large screens */}
       <div className="hidden lg:flex w-full max-w-lg">
         <SearchInput />
@@ -40,10 +55,11 @@ export const Navbar = () => {
               organizationSwitcherTrigger: {
                 padding: "6px",
                 width: "100%",
-                borderRadius: "8px",
-                border: "1px solid #E5E7EB",
+                borderRadius: "10px",
+                border: "1px solid rgba(255,255,255,0.08)",
                 justifyContent: "space-between",
-                backgroundColor: "white",
+                backgroundColor: "rgba(255,255,255,0.04)",
+                color: "#f1f5f9",
               },
             },
           }}
@@ -51,7 +67,7 @@ export const Navbar = () => {
       </div>
 
       {/* Right side */}
-      <div className="flex items-center gap-2 lg:gap-4">
+      <div className="flex items-center gap-2 lg:gap-3 ml-auto">
         
         {organization && (
             <InviteButton />
@@ -59,7 +75,7 @@ export const Navbar = () => {
 
         <SignedOut>
           <SignInButton>
-            <Button variant="secondary" size="sm">
+            <Button variant="secondary" size="sm" className="bg-indigo-600 hover:bg-indigo-500 text-white border-0">
               Sign In
             </Button>
           </SignInButton>
@@ -72,7 +88,7 @@ export const Navbar = () => {
             </Button>
           </SignOutButton>
 
-          <div className="ml-2">
+          <div className="ml-1">
             <UserButton afterSignOutUrl="/" />
           </div>
         </SignedIn>

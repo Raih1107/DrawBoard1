@@ -24,11 +24,10 @@ export const NewButton = () => {
                         align="start"
                         sideOffset={18}
                         >
-                        <button className="bg-white/25 h-full w-full rounded-md flex items-center justify-center opacity-60 hover:opacity-100 transition">
-                        <Plus className="text-white" />
+                        <button className="relative group h-full w-full rounded-xl flex items-center justify-center transition-all duration-200 bg-white/5 hover:bg-indigo-600/20 border border-white/10 hover:border-indigo-500/50">
+                            <Plus className="text-slate-400 group-hover:text-indigo-400 transition-colors w-5 h-5" />
                         </button>
                     </Hint>
-                    
                 </div>
 
             </DialogTrigger>

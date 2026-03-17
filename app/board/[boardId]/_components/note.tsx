@@ -68,10 +68,11 @@ export const Note = ({
             height={height}
             onPointerDown={(e) => onPointerDown(e, id)}
             style={{
-                outline:selectionColor ? `1px solid ${selectionColor}` : "none",
+                outline: selectionColor ? `2px solid ${selectionColor}` : "none",
                 backgroundColor: fill ? colorToCss(fill) : "#FFF",
+                borderRadius: "8px", // Mostly for modern browsers
             }}
-            className="shadow-md drop-shadow-xl"
+            className="shadow-xl drop-shadow-2xl"
         >
             <ContentEditable 
                 html={value ||"Text"}

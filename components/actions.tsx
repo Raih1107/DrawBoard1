@@ -64,36 +64,40 @@ export const Actions = ({
                 side={side}
                 onClick={(e) => e.stopPropagation()}
                 sideOffset={sideOffset}
-                className="w-60 bg-black text-white border-none"
+                className="w-60 px-2 py-2 shadow-[0_8px_32px_rgba(0,0,0,0.4)] rounded-xl"
+                style={{
+                    background: "rgba(15,17,23,0.9)",
+                    backdropFilter: "blur(20px)",
+                    border: "1px solid rgba(255,255,255,0.08)"
+                }}
             >
                 <DropdownMenuItem
                     onClick={onCopyLink}
-                    className="p-3 cursor-pointer"
+                    className="p-3 cursor-pointer rounded-lg hover:bg-white/5 transition-colors focus:bg-white/5 focus:text-white"
                 >
-                    <Link2 className="h-4 w-4 mr-2 " />
+                    <Link2 className="h-4 w-4 mr-2" />
                     Copy board link
                 </DropdownMenuItem>
 
                 <DropdownMenuItem
                     onClick={() => onOpen(id, title)}
-                    className="p-3 cursor-pointer"
+                    className="p-3 cursor-pointer rounded-lg hover:bg-white/5 transition-colors focus:bg-white/5 focus:text-white"
                 >
-                    <Pencil className="h-4 w-4 mr-2 " />
+                    <Pencil className="h-4 w-4 mr-2" />
                     Rename
                 </DropdownMenuItem>
 
                 <ConfirmModal
-                    header="Delte board?"
+                    header="Delete board?"
                     description="This will delete the board and all of its contents."
                     disabled={pending}
                     onConfirm={onDelete}
                 >
                     <Button
-                        // onClick={onDelete}
                         variant="ghost"
-                        className="p-3 text-sm justify-start w-full font-normal cursor-pointer"
-                        >
-                        <Trash2 className="h-4 w-4 mr-2 " />
+                        className="p-3 text-sm justify-start w-full font-normal cursor-pointer rounded-lg text-rose-400 hover:text-white hover:bg-rose-500/80 transition-all"
+                    >
+                        <Trash2 className="h-4 w-4 mr-2" />
                         Delete 
                     </Button>
                 </ConfirmModal>

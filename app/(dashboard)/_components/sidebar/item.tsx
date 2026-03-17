@@ -38,19 +38,26 @@ export const Item = ({
                 align="start"
                 sideOffset={18}
             >
-                <Image  
-                    fill
-                    src={imageUrl}
-                    alt={name}
+                <div
                     onClick={onClick}
-                    className={cn("rounded-md cursor-pointer opacity-75 hover:opacity-100 transition",
-                        isActive && "opacity-100"
+                    className={cn(
+                        "relative w-full h-full rounded-xl cursor-pointer transition-all duration-200 overflow-hidden",
+                        "ring-2 ring-transparent hover:ring-indigo-500/60",
+                        isActive && "ring-indigo-500 shadow-[0_0_12px_rgba(99,102,241,0.5)]"
                     )}
-
-                />
+                    style={{ transform: isActive ? "scale(1.05)" : "scale(1)" }}
+                >
+                    <Image  
+                        fill
+                        src={imageUrl}
+                        alt={name}
+                        className={cn(
+                            "object-cover opacity-75 hover:opacity-100 transition-opacity",
+                            isActive && "opacity-100"
+                        )}
+                    />
+                </div>
             </Hint>
-
-
         </div>
     )
 }
