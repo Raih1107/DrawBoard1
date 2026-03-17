@@ -78,7 +78,7 @@ export const Info = ({
                             backgroundClip: "text"
                         }}
                         >
-                            Canvasly
+                            DrawBoard
                         </span>
                     </Link>
                 </Button>

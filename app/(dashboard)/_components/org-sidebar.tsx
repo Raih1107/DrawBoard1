@@ -59,7 +59,7 @@ export const OrgSidebar = () => {
                         backgroundClip: "text"
                     }}
                     >
-                        Canvasly
+                        DrawBoard
                     </span>
                 </div>
             </Link>
