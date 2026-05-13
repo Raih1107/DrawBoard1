@@ -7,7 +7,6 @@ import { Rectangle } from "./rectangle";
 import { Ellipse } from "./ellipse";
 import { Text } from "./text";
 import { Note } from "./note";
-import { Arrow } from "./arrow";
 import { Path } from "./path";
 import { colorToCss } from "@/lib/utils";
 
@@ -93,7 +92,7 @@ export const LayerPreview = memo(({
         );
 
         default:
-            console.warn("Unkk=nown layer type");
+            console.warn("Unknown layer type");
             return null;
     }
 

@@ -59,12 +59,6 @@ export const Toolbar = ({
         case "6":
           setCanvasState({ mode: CanvasMode.Pencil });
           break;
-        case "7":
-          setCanvasState({ mode: CanvasMode.Inserting, layerType: LayerType.Arrow });
-          break;
-        case "8":
-          setCanvasState({ mode: CanvasMode.Eraser });
-          break;
         case "9":
           undo();
           break;

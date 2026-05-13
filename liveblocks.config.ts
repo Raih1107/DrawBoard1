@@ -6,7 +6,7 @@ import { Color, Layer } from "./types/canvas";
 
 const client = createClient({
   throttle: 16,
-  authEndpoint: "/api/livebloacks-auth",
+  authEndpoint: "/api/liveblocks-auth",
 })
 
 declare global {

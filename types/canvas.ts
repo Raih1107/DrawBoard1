@@ -15,7 +15,6 @@ export enum LayerType {
     Path,
     Text,
     Note,
-    Arrow, // ✅ New
 }
 
 export type RectangleLayer = {
@@ -69,14 +68,6 @@ export type NoteLayer = {
     value?: string;
 };
 
-// ✅ New Arrow Layer
-export type ArrowLayer = {
-    type: LayerType.Arrow;
-    start: Point;
-    end: Point;
-    stroke: Color;
-};
-
 export type Point = {
     x: number;
     y: number;
@@ -96,7 +87,6 @@ export enum Side {
     Right = 8,
 }
 
-// ✅ CanvasMode now includes Eraser
 export enum CanvasMode {
     None,
     Pressing,
@@ -105,10 +95,8 @@ export enum CanvasMode {
     Inserting,
     Resizing,
     Pencil,
-    Eraser, // ✅ New
 }
 
-// ✅ CanvasState updated to allow Eraser
 export type CanvasState =
     | { mode: CanvasMode.None }
     | { mode: CanvasMode.SelectionNet; origin: Point; current?: Point }
@@ -116,8 +104,7 @@ export type CanvasState =
     | { mode: CanvasMode.Inserting; layerType: LayerType; }
     | { mode: CanvasMode.Pencil }
     | { mode: CanvasMode.Pressing; origin: Point }
-    | { mode: CanvasMode.Resizing; initialBounds: XYWH; corner: Side }
-    | { mode: CanvasMode.Eraser }; // ✅ New
+    | { mode: CanvasMode.Resizing; initialBounds: XYWH; corner: Side };
 
 // ✅ Optional: Unified Layer type if needed
 export type Layer =
@@ -125,5 +112,4 @@ export type Layer =
     | EllipseLayer
     | PathLayer
     | TextLayer
-    | NoteLayer
-    | ArrowLayer;
+    | NoteLayer;

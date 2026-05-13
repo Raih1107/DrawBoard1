@@ -46,7 +46,7 @@ export const Canvas = ({
 
     const insertLayer = useMutation((
         {storage, setMyPresence},
-        layerType: LayerType.Ellipse | LayerType.Rectangle | LayerType.Note | LayerType.Text | LayerType.Path | LayerType.Arrow,
+        layerType: LayerType.Ellipse | LayerType.Rectangle | LayerType.Note | LayerType.Text | LayerType.Path,
         position: Point,
     ) => {
         const liveLayers = storage.get("layers");
