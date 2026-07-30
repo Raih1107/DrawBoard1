@@ -1,7 +1,8 @@
-import { Suspense } from "react"; // 1. Import Suspense
+import { Suspense } from "react";
 import { Navbar } from "./_components/navbar";
 import { OrgSidebar } from "./_components/org-sidebar";
 import { Sidebar } from "./_components/sidebar";
+import { SoleAdminBanner } from "./_components/sole-admin-banner";
 
 interface DashboardLayoutProps {
     children: React.ReactNode;
@@ -15,17 +16,19 @@ const DashboardLayout = ({
             <Sidebar />
             <div className="pl-[60px] h-full">
                 <div className="flex gap-x-3 h-full">
-                    {/* 2. Wrap OrgSidebar in Suspense */}
                     <Suspense fallback={<div className="hidden lg:flex flex-col w-[206px]" />}>
                         <OrgSidebar />
                     </Suspense>
-                    <div className="h-full flex-1">
+                    <div className="h-full flex-1 flex flex-col">
                         <Navbar />
-                        {children}
+                        <SoleAdminBanner />
+                        <div className="flex-1 overflow-y-auto">
+                            {children}
+                        </div>
                     </div>
                 </div>
             </div>
-        </main >
+        </main>
     )
 }
 

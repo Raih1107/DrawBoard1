@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Star } from "lucide-react";
+import { Globe, Lock, Star } from "lucide-react";
 
 interface FooterProps {
     title: string;
@@ -8,6 +8,8 @@ interface FooterProps {
     isFavourite: boolean;
     onClick: () => void;
     disabled: boolean;
+    viewCount?: number;
+    isPublic?: boolean;
 };
 
 export const Footer = ({
@@ -16,7 +18,9 @@ export const Footer = ({
     createdAtLabel,
     isFavourite,
     onClick,
-    disabled
+    disabled,
+    viewCount = 0,
+    isPublic = false,
 }: FooterProps) => {
 
     const handleClick = (
@@ -40,6 +44,32 @@ export const Footer = ({
             <p className="opacity-0 group-hover:opacity-100 transition-opacity text-[11px] text-slate-400 truncate mt-0.5">
                 {authorLabel} · {createdAtLabel}
             </p>
+
+            {/* View count + public badge row */}
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-2 mt-1">
+                {/* Views */}
+                <span className="flex items-center gap-1 text-[10px] text-slate-500">
+                    <span>👁</span>
+                    <span>{viewCount.toLocaleString()}</span>
+                </span>
+
+                {/* Public / Private badge */}
+                <span
+                    className={cn(
+                        "flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded-full font-medium",
+                        isPublic
+                            ? "text-emerald-400 bg-emerald-400/10"
+                            : "text-slate-500 bg-white/5"
+                    )}
+                >
+                    {isPublic
+                        ? <Globe className="w-2.5 h-2.5" />
+                        : <Lock className="w-2.5 h-2.5" />
+                    }
+                    {isPublic ? "Public" : "Private"}
+                </span>
+            </div>
+
             <button
                 disabled={disabled}
                 onClick={handleClick}

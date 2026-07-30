@@ -1,6 +1,18 @@
-import { clerkMiddleware } from '@clerk/nextjs/server';
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
-export default clerkMiddleware();
+// All routes are protected by default EXCEPT:
+// - /board/[boardId] — the page itself handles auth (public boards are viewable without login)
+// - /api/liveblocks-auth — the auth route handles anonymous guest logic explicitly
+const isPublicRoute = createRouteMatcher([
+  '/board/(.*)',
+  '/api/liveblocks-auth',
+]);
+
+export default clerkMiddleware(async (auth, req) => {
+  if (!isPublicRoute(req)) {
+    await auth.protect();
+  }
+});
 
 export const config = {
   matcher: [

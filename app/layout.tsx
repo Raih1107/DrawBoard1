@@ -3,6 +3,7 @@
 import type { Metadata } from "next";
 
 import "./globals.css";
+import { CollaborationNotifier } from "@/app/(dashboard)/_components/collaboration-notifier";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ConvexClientProvider } from "@/providers/convex-client-provider";
 import { Toaster } from "sonner";
@@ -31,8 +32,9 @@ export default function RootLayout({
       <body className={`${inter.variable} antialiased`}>
 
         <ConvexClientProvider>
-            <Toaster />
+            <Toaster position="bottom-right" richColors closeButton />
             <ModalProvider />
+            <CollaborationNotifier />
             {children}
         </ConvexClientProvider>
         

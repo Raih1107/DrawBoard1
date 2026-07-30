@@ -11,6 +11,8 @@ export default defineSchema({
         authorId: v.string(),
         authorName: v.string(),
         imageUrl: v.string(),
+        viewCount: v.optional(v.number()),
+        isPublic: v.optional(v.boolean()),
     })
         .index("by_org", ["orgId"])
         .searchIndex("search_title" , {
@@ -28,5 +30,21 @@ export default defineSchema({
     .index("by_board", ["boardId"])
     .index("by_user_org", ["userId", "orgId"])
     .index("by_user_board", ["userId", "boardId"])
-    .index("by_user_board_org", ["userId", "boardId", "orgId"])
+    .index("by_user_board_org", ["userId", "boardId", "orgId"]),
+
+    collabRequests: defineTable({
+        boardId: v.id("boards"),
+        boardTitle: v.string(),
+        requesterId: v.string(),
+        requesterName: v.string(),
+        orgId: v.string(),
+        status: v.union(
+            v.literal("pending"),
+            v.literal("approved"),
+            v.literal("rejected"),
+            v.literal("blocked")
+        ),
+    })
+    .index("by_org", ["orgId"])
+    .index("by_board_and_user", ["boardId", "requesterId"]),
 });

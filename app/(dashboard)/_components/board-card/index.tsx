@@ -23,6 +23,8 @@ interface BoardCardProps {
   imageUrl: string;
   orgId: string;
   isFavourite: boolean;
+  viewCount?: number;
+  isPublic?: boolean;
 }
 
 export const BoardCard = ({
@@ -34,6 +36,8 @@ export const BoardCard = ({
   imageUrl,
   orgId,
   isFavourite,
+  viewCount = 0,
+  isPublic = false,
 }: BoardCardProps) => {
   const { userId } = useAuth();
 
@@ -88,7 +92,7 @@ export const BoardCard = ({
             className="object-cover"
           />
           <Overlay />
-          <Actions id={id} title={title} side="right">
+          <Actions id={id} title={title} isPublic={isPublic} side="right">
             <button className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1.5 outline-none rounded-lg"
               style={{ background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)" }}
             >
@@ -104,6 +108,8 @@ export const BoardCard = ({
           createdAtLabel={createdAtLabel}
           onClick={toggleFavourite}
           disabled={pendingFavoruite || pendingUnFavoruite}
+          viewCount={viewCount}
+          isPublic={isPublic}
         />
       </div>
     </Link>

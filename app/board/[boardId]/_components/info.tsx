@@ -8,8 +8,15 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { cn } from "@/lib/utils";
 import { useRenameModal } from "@/store/use-rename-modal";
+import { useExportCanvas } from "@/hooks/use-export-canvas";
 import { useQuery } from "convex/react";
-import { Menu } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Download, Eye, FileImage, FileText, Globe, Lock, Menu } from "lucide-react";
 import { Poppins } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
@@ -41,7 +48,12 @@ export const Info = ({
         id: boardId as Id<"boards">,
     });
 
+    const { exportAsPng, exportAsPdf } = useExportCanvas(data?.title ?? "board");
+
     if(!data) return <InfoSkeleton />;
+
+    const isPublic = data.isPublic ?? false;
+    const viewCount = data.viewCount ?? 0;
 
     return(
         <div 
@@ -98,9 +110,86 @@ export const Info = ({
 
             <TabSeparator />
 
+            {/* Live view count badge */}
+            <Hint label="Total views" side={"bottom" as any} sideOffset={14}>
+                <div className="flex items-center gap-1.5 px-2.5 h-7 rounded-lg select-none"
+                    style={{ background: "rgba(255,255,255,0.05)" }}
+                >
+                    <Eye className="w-3.5 h-3.5 text-slate-400" />
+                    <span className="text-xs font-medium text-slate-300">
+                        {viewCount.toLocaleString()}
+                    </span>
+                </div>
+            </Hint>
+
+            <TabSeparator />
+
+            {/* Public / private status pill */}
+            <Hint label={isPublic ? "Board is public" : "Board is private"} side={"bottom" as any} sideOffset={14}>
+                <div className="flex items-center gap-1.5 px-2.5 h-7 rounded-lg select-none"
+                    style={{
+                        background: isPublic ? "rgba(16,185,129,0.1)" : "rgba(255,255,255,0.05)",
+                        border: `1px solid ${isPublic ? "rgba(16,185,129,0.25)" : "rgba(255,255,255,0.08)"}`
+                    }}
+                >
+                    {isPublic
+                        ? <Globe className="w-3.5 h-3.5 text-emerald-400" />
+                        : <Lock className="w-3.5 h-3.5 text-slate-400" />
+                    }
+                    <span className={`text-xs font-medium ${isPublic ? "text-emerald-400" : "text-slate-400"}`}>
+                        {isPublic ? "Public" : "Private"}
+                    </span>
+                </div>
+            </Hint>
+
+            <TabSeparator />
+
+            {/* Download button */}
+            <DropdownMenu>
+                <Hint label="Download" side={"bottom" as any} sideOffset={14}>
+                    <DropdownMenuTrigger asChild>
+                        <Button
+                            size="icon"
+                            variant="ghost"
+                            className="w-10 h-10 hover:bg-white/10 rounded-lg text-slate-200"
+                        >
+                            <Download className="w-5 h-5" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                </Hint>
+                <DropdownMenuContent
+                    side="bottom"
+                    sideOffset={14}
+                    className="w-44 px-2 py-2 shadow-[0_8px_32px_rgba(0,0,0,0.4)] rounded-xl"
+                    style={{
+                        background: "rgba(15,17,23,0.9)",
+                        backdropFilter: "blur(20px)",
+                        border: "1px solid rgba(255,255,255,0.08)"
+                    }}
+                >
+                    <DropdownMenuItem
+                        onClick={exportAsPng}
+                        className="p-3 cursor-pointer rounded-lg hover:bg-white/5 transition-colors focus:bg-white/5 focus:text-white"
+                    >
+                        <FileImage className="h-4 w-4 mr-2 text-indigo-400" />
+                        Export as PNG
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                        onClick={exportAsPdf}
+                        className="p-3 cursor-pointer rounded-lg hover:bg-white/5 transition-colors focus:bg-white/5 focus:text-white"
+                    >
+                        <FileText className="h-4 w-4 mr-2 text-rose-400" />
+                        Export as PDF
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
+
+            <TabSeparator />
+
             <Actions
                 id={data._id}
                 title={data.title}
+                isPublic={isPublic}
                 side="bottom"
                 sideOffset={14}
             >

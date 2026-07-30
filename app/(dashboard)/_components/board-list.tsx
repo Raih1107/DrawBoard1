@@ -84,6 +84,8 @@ export const BoardList = ({ orgId, query }: BoardListProps) => {
             createdAt={board._creationTime}
             orgId={board.orgId}
             isFavourite={board.isFavourite}
+            viewCount={board.viewCount}
+            isPublic={board.isPublic}
           />
         ))}
       </div>

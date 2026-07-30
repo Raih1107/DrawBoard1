@@ -49,6 +49,8 @@ export const create = mutation({
             authorId: identity.subject,
             authorName: identity.name!,
             imageUrl: randomImage,
+            viewCount: 0,
+            isPublic: false,
         });
 
         return board;
@@ -210,5 +212,68 @@ export const get = query({
         const board = await ctx.db.get(args.id);
 
         return board;
+    },
+});
+
+// ─── NEW: Public read (no auth required) ────────────────────────────────────
+
+/** Fetch a board without requiring authentication. Used for public view mode. */
+export const getPublic = query({
+    args: { id: v.id("boards") },
+    handler: async (ctx, args) => {
+        const board = await ctx.db.get(args.id);
+        return board;
+    },
+});
+
+// ─── NEW: View count ─────────────────────────────────────────────────────────
+
+/**
+ * Increment the view counter each time a board is opened.
+ * Does NOT require the user to be authenticated (public boards are viewable
+ * without login), so we intentionally skip the identity check here.
+ */
+export const incrementViewCount = mutation({
+    args: { id: v.id("boards") },
+    handler: async (ctx, args) => {
+        const board = await ctx.db.get(args.id);
+        if (!board) return;
+
+        await ctx.db.patch(args.id, {
+            viewCount: (board.viewCount ?? 0) + 1,
+        });
+    },
+});
+
+// ─── NEW: Toggle public / private ────────────────────────────────────────────
+
+/**
+ * Flip the isPublic flag on a board.
+ * Only the board's author is allowed to do this.
+ */
+export const togglePublic = mutation({
+    args: { id: v.id("boards") },
+    handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity();
+
+        if (!identity) {
+            throw new Error("Unauthorized");
+        }
+
+        const board = await ctx.db.get(args.id);
+
+        if (!board) {
+            throw new Error("Board not found");
+        }
+
+        if (board.authorId !== identity.subject) {
+            throw new Error("Only the board author can change its visibility");
+        }
+
+        await ctx.db.patch(args.id, {
+            isPublic: !(board.isPublic ?? false),
+        });
+
+        return { isPublic: !(board.isPublic ?? false) };
     },
 });

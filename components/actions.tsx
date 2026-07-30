@@ -5,11 +5,10 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Ghost, Link2, Pencil, Trash2 } from "lucide-react";
+import { Globe, Link2, Lock, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useApiMutation } from "@/hooks/use-api-mutation";
 import { api } from "@/convex/_generated/api";
@@ -21,8 +20,9 @@ interface ActionsProps {
     children: React.ReactNode;
     side?: DropdownMenuContentProps["side"];
     sideOffset?: DropdownMenuContentProps["sideOffset"];
-    id: string ;
-    title: string ;
+    id: string;
+    title: string;
+    isPublic?: boolean;
 }
 
 
@@ -32,12 +32,14 @@ export const Actions = ({
     sideOffset,
     id,
     title,
+    isPublic = false,
 
 } : ActionsProps) => {
 
     const { onOpen } = useRenameModal();
 
-    const {mutate, pending} = useApiMutation(api.board.remove);
+    const {mutate: remove, pending: removePending} = useApiMutation(api.board.remove);
+    const {mutate: togglePublic, pending: togglePending} = useApiMutation(api.board.togglePublic);
 
 
     const onCopyLink = () => {
@@ -49,11 +51,19 @@ export const Actions = ({
     }
 
     const onDelete = () => {
-        mutate({id}) 
+        remove({id}) 
             .then(() => toast.success("Board deleted"))
             .catch(() => toast.error("Failed to delete board"));
         
     }
+
+    const onTogglePublic = () => {
+        togglePublic({ id })
+            .then(() =>
+                toast.success(isPublic ? "Board is now private 🔒" : "Board is now public 🌐")
+            )
+            .catch(() => toast.error("Failed to update visibility"));
+    };
 
     return (
         <DropdownMenu >
@@ -87,10 +97,31 @@ export const Actions = ({
                     Rename
                 </DropdownMenuItem>
 
+                {/* Toggle public / private */}
+                <DropdownMenuItem
+                    onClick={onTogglePublic}
+                    disabled={togglePending}
+                    className="p-3 cursor-pointer rounded-lg hover:bg-white/5 transition-colors focus:bg-white/5 focus:text-white"
+                >
+                    {isPublic ? (
+                        <>
+                            <Lock className="h-4 w-4 mr-2 text-amber-400" />
+                            Make Private
+                        </>
+                    ) : (
+                        <>
+                            <Globe className="h-4 w-4 mr-2 text-emerald-400" />
+                            Make Public
+                        </>
+                    )}
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator className="bg-white/5 my-1" />
+
                 <ConfirmModal
                     header="Delete board?"
                     description="This will delete the board and all of its contents."
-                    disabled={pending}
+                    disabled={removePending}
                     onConfirm={onDelete}
                 >
                     <Button

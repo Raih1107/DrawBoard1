@@ -31,8 +31,10 @@ declare global {
     UserMeta: {
       id?: string;
       info?: {
+        id?: string;
         name?: string;
         picture?: string;
+        role?: "editor" | "viewer";
       };
     };
 

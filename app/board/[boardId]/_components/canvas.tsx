@@ -4,6 +4,12 @@ import { nanoid } from "nanoid";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Info } from "./info";
 import { Participants } from "./participants";
+import { useAuth, useUser, useClerk } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { api } from "@/convex/_generated/api";
+import { useMutation as useConvexMutation } from "convex/react";
 import { Toolbar } from "./toolbar";
 import { Camera, CanvasMode, CanvasState, Color, LayerType, Point, Side, XYWH } from "@/types/canvas";
 import { useCanRedo, useCanUndo, useHistory, useMutation, useOthersMapped, useSelf, useStorage} from "@liveblocks/react";
@@ -21,11 +27,26 @@ const MAX_LAYERS = 100;
 
 interface CanvasProps {
     boardId: string;
+    title?: string;
+    orgId?: string;
+    isReadOnly?: boolean;
+    myRequestStatus?: "pending" | "approved" | "rejected" | "blocked" | null;
 }
 
 export const Canvas = ({
     boardId,
+    title,
+    orgId,
+    isReadOnly,
+    myRequestStatus,
 }: CanvasProps) => {
+    const { isSignedIn } = useAuth();
+    const { user } = useUser();
+    const router = useRouter();
+    const createCollabRequest = useConvexMutation(api.requests.create);
+    const [isRequesting, setIsRequesting] = useState(false);
+    const [cooldown, setCooldown] = useState(0);
+
     const layerIds = useStorage((root) => root.layerIds);
     const pencilDraft = useSelf((me) => me.presence.pencilDraft);
 
@@ -302,6 +323,44 @@ export const Canvas = ({
         return () => document.removeEventListener("keydown", onKeyDown);
     }, [deleteLayers, history]);
 
+    // Timer logic for collaboration request cooldown
+    useEffect(() => {
+        if (cooldown <= 0) return;
+        const timer = setInterval(() => setCooldown((prev) => prev - 1), 1000);
+        return () => clearInterval(timer);
+    }, [cooldown]);
+
+    const { redirectToSignIn } = useClerk();
+
+    const handleRequestCollab = async () => {
+        if (cooldown > 0) return;
+        if (!isSignedIn) {
+            redirectToSignIn({ signInFallbackRedirectUrl: window.location.href });
+            return;
+        }
+        if (!user || !title || !orgId) return;
+
+        try {
+            setIsRequesting(true);
+            await createCollabRequest({
+                boardId: boardId as any,
+                boardTitle: title,
+                orgId: orgId,
+                requesterId: user.id,
+                requesterName: user.firstName || "Anonymous User",
+            });
+            toast.success("Collaboration request sent!");
+            setCooldown(30); // Start 30s cooldown on success
+        } catch (error: any) {
+            toast.error(error.message || "Failed to send request.");
+            if (error.message?.includes("rejected") || error.message?.includes("blocked")) {
+                 setCooldown(30); // Also cooldown if they hit an error state
+            }
+        } finally {
+            setIsRequesting(false);
+        }
+    };
+
     return (
         <main 
             className="h-full w-full relative touch-none overflow-hidden"
@@ -313,22 +372,63 @@ export const Canvas = ({
         >
             <Info boardId={boardId} />
             <Participants />
-            <Toolbar 
-                canvasState={canvasState}
-                setCanvasState={setCanvasState}
-                canRedo={canRedo}
-                canUndo={canUndo}
-                undo={history.undo}
-                redo={history.redo}
-            />
-            <SelectionTools camera={camera} setLastUsedColor={setLastUsedColor} />
+            
+            {isReadOnly && (
+                <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] flex items-center justify-center px-4">
+                    <div className="bg-slate-900/40 border border-white/10 rounded-full p-1.5 flex items-center shadow-2xl backdrop-blur-md transition-all">
+                        <div className="px-3 flex items-center gap-2">
+                            <span className="text-amber-400 text-[13px] drop-shadow-sm">👁️</span>
+                            <span className="text-slate-200 text-xs font-semibold tracking-wide">View Only</span>
+                        </div>
+                        
+                        <span className="w-px h-5 bg-white/15 mx-1" />
+
+                        {myRequestStatus !== "blocked" && (
+                            <div className="flex items-center">
+                                {myRequestStatus === "pending" ? (
+                                    <div className="px-4 py-1.5 text-xs text-indigo-300 font-semibold flex items-center gap-2 bg-indigo-500/10 rounded-full border border-indigo-500/20">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />
+                                        Pending Approval...
+                                    </div>
+                                ) : (
+                                    <Button
+                                        size="sm"
+                                        className="h-7 text-xs bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-900/20 text-white rounded-full px-4 font-semibold transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
+                                        onClick={handleRequestCollab}
+                                        disabled={isRequesting || cooldown > 0}
+                                    >
+                                        {isRequesting ? "Sending..." : cooldown > 0 ? `Wait ${cooldown}s to send again` : "Request to Collaborate ✨"}
+                                    </Button>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {!isReadOnly && (
+                <>
+                    <Toolbar 
+                        canvasState={canvasState}
+                        setCanvasState={setCanvasState}
+                        canRedo={canRedo}
+                        canUndo={canUndo}
+                        undo={history.undo}
+                        redo={history.redo}
+                    />
+                    <SelectionTools camera={camera} setLastUsedColor={setLastUsedColor} />
+                </>
+            )}
+
             <svg
+                id="board-canvas-svg"
                 className="h-[100vh] w-[100vw]"
+                style={{ pointerEvents: isReadOnly ? "none" : "auto" }} // Disables clicking/editing but allows scrolling on main wrapper
                 onWheel={onWheel}
-                onPointerMove={onPointerMove}
-                onPointerLeave={onPointerLeave}
-                onPointerDown={onPointerDown}
-                onPointerUp={onPointerUp}
+                onPointerMove={!isReadOnly ? onPointerMove : undefined}
+                onPointerLeave={!isReadOnly ? onPointerLeave : undefined}
+                onPointerDown={!isReadOnly ? onPointerDown : undefined}
+                onPointerUp={!isReadOnly ? onPointerUp : undefined}
             >
                 <g style={{ transform: `translate(${camera.x}px, ${camera.y}px)` }}>
                     {layerIds?.map((layerId) => (

@@ -1,6 +1,5 @@
 import { v } from "convex/values"
 import { query } from "./_generated/server"
-import { favourite } from "./board";
 import { getAllOrThrow } from "convex-helpers/server/relationships";
 
 
@@ -38,12 +37,14 @@ export const get = query({
                 return boards.map((board) => ({
                     ...board,
                     isFavourite: true,
+                    viewCount: board.viewCount ?? 0,
+                    isPublic: board.isPublic ?? false,
                 }));
 
         }
 
         const title = args.search as string;
-        let boards = [];
+        let boards = [] as any[];
 
         if(title){
             boards = await ctx.db
@@ -64,6 +65,7 @@ export const get = query({
 
         
 
+
         
         const boardsWithFavouriteRelation = boards.map((board) => {
             return ctx.db
@@ -78,7 +80,8 @@ export const get = query({
                     return {
                         ...board,
                         isFavourite: !!favourite,
-
+                        viewCount: board.viewCount ?? 0,
+                        isPublic: board.isPublic ?? false,
                     };
                 });
         })
