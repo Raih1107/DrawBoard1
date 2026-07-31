@@ -15,6 +15,7 @@ export enum LayerType {
     Path,
     Text,
     Note,
+    Line,
 }
 
 export type RectangleLayer = {
@@ -45,6 +46,19 @@ export type PathLayer = {
     width: number;
     fill: Color;
     points: number[][]; // [ [x1, y1], [x2, y2], ... ]
+    value?: string;
+};
+
+export type LineLayer = {
+    type: LayerType.Line;
+    x: number;  // start x
+    y: number;  // start y
+    x2: number; // end x
+    y2: number; // end y
+    height: number;
+    width: number;
+    fill: Color;
+    strokeWidth?: number;
     value?: string;
 };
 
@@ -95,6 +109,8 @@ export enum CanvasMode {
     Inserting,
     Resizing,
     Pencil,
+    Eraser,
+    Line,
 }
 
 export type CanvasState =
@@ -104,12 +120,14 @@ export type CanvasState =
     | { mode: CanvasMode.Inserting; layerType: LayerType; }
     | { mode: CanvasMode.Pencil }
     | { mode: CanvasMode.Pressing; origin: Point }
-    | { mode: CanvasMode.Resizing; initialBounds: XYWH; corner: Side };
+    | { mode: CanvasMode.Resizing; initialBounds: XYWH; corner: Side }
+    | { mode: CanvasMode.Eraser }
+    | { mode: CanvasMode.Line; origin?: Point; current?: Point };
 
-// ✅ Optional: Unified Layer type if needed
 export type Layer =
     | RectangleLayer
     | EllipseLayer
     | PathLayer
     | TextLayer
-    | NoteLayer;
+    | NoteLayer
+    | LineLayer;

@@ -47,4 +47,11 @@ export default defineSchema({
     })
     .index("by_org", ["orgId"])
     .index("by_board_and_user", ["boardId", "requesterId"]),
+
+    roleUpdates: defineTable({
+        orgId: v.string(),
+        userId: v.string(),
+        orgName: v.string(),
+        newRole: v.string(),
+    }).index("by_user", ["userId"]),
 });

@@ -42,7 +42,7 @@ export async function POST(request: Request){
     // Handle unauthenticated guests
     if (!authorization || !user) {
         if (board?.isPublic) {
-            const guestId = `guest_${Math.floor(Math.random() * 10000)}`;
+            const guestId = `guest_${crypto.randomUUID()}`;
             const session = liveblocks.prepareSession(guestId, {
                 userInfo: { id: guestId, name: "Guest", picture: "", role: "viewer" }
             });

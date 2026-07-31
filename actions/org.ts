@@ -49,3 +49,26 @@ export async function promoteMemberToAdmin(orgId: string, userId: string) {
         return { error: error.message || "Failed to promote member." };
     }
 }
+
+/**
+ * Gets the current user's memberships directly from the backend to bypass
+ * client-side session cache delays. Used for real-time role change polling.
+ */
+export async function getCurrentUserMemberships(userId: string | null | undefined, _timestamp?: number) {
+    if (!userId) return [];
+    try {
+        const client = await clerkClient();
+        const { data: memberships } = await client.users.getOrganizationMembershipList({
+            userId,
+            limit: 50,
+        });
+        
+        return memberships.map((m) => ({
+            orgId: m.organization.id,
+            orgName: m.organization.name,
+            role: m.role,
+        }));
+    } catch {
+        return [];
+    }
+}

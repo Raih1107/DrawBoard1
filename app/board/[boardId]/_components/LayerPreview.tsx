@@ -9,6 +9,7 @@ import { Text } from "./text";
 import { Note } from "./note";
 import { Path } from "./path";
 import { colorToCss } from "@/lib/utils";
+import { LineLayerComponent } from "./line-layer";
 
 
 interface LayerPreviewProps {
@@ -51,6 +52,17 @@ export const LayerPreview = memo(({
             )
 
 
+
+        case LayerType.Line:
+            return (
+                <LineLayerComponent
+                    key={id}
+                    id={id}
+                    layer={layer as any}
+                    onPointerDown={onLayerPointerDown}
+                    selectionColor={selectionColor}
+                />
+            );
 
         case LayerType.Note:
             return (

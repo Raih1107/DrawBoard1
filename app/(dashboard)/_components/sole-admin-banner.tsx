@@ -6,6 +6,8 @@ import { ShieldAlert, ChevronDown, CheckCircle2, Loader2 } from "lucide-react";
 import { getOrgAdminStatus, promoteMemberToAdmin } from "@/actions/org";
 import { toast } from "sonner";
 import Image from "next/image";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 interface PromotableMember {
     userId: string;
@@ -22,6 +24,8 @@ export const SoleAdminBanner = () => {
     const [open, setOpen] = useState(false);
     const [isPending, startTransition] = useTransition();
     const [promotingId, setPromotingId] = useState<string | null>(null);
+
+    const broadcastPromotion = useMutation(api.roleUpdates.create);
 
     useEffect(() => {
         if (!organization?.id || !user?.id) return;
@@ -43,7 +47,18 @@ export const SoleAdminBanner = () => {
             if (result.error) {
                 toast.error(`Failed to promote: ${result.error}`);
             } else {
-                toast.success(`✅ ${member.name} is now an admin!`);
+                toast.success(`${member.name} is now an admin of ${organization.name}!`, {
+                    description: "They can now manage collaboration requests and promote other members.",
+                    duration: 6000,
+                });
+                // Broadcast this exactly via Convex so the target member gets an instant toast + session reload.
+                await broadcastPromotion({
+                    orgId: organization.id,
+                    orgName: organization.name,
+                    userId: member.userId,
+                    newRole: "org:admin"
+                });
+                
                 setIsSoleAdmin(false);
                 setOpen(false);
             }

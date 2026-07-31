@@ -2,6 +2,7 @@
 
 import { nanoid } from "nanoid";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Eye, Send } from "lucide-react";
 import { Info } from "./info";
 import { Participants } from "./participants";
 import { useAuth, useUser, useClerk } from "@clerk/nextjs";
@@ -46,6 +47,9 @@ export const Canvas = ({
     const createCollabRequest = useConvexMutation(api.requests.create);
     const [isRequesting, setIsRequesting] = useState(false);
     const [cooldown, setCooldown] = useState(0);
+    const [eraserSize, setEraserSize] = useState(20);
+    const [lineOrigin, setLineOrigin] = useState<{x:number;y:number} | null>(null);
+    const [lineCurrent, setLineCurrent] = useState<{x:number;y:number} | null>(null);
 
     const layerIds = useStorage((root) => root.layerIds);
     const pencilDraft = useSelf((me) => me.presence.pencilDraft);
@@ -200,6 +204,61 @@ export const Canvas = ({
         });
     }, [lastUsedColor]);
 
+    // Insert a straight line layer from origin to end point
+    const insertLine = useMutation(({storage}, origin: Point, end: Point) => {
+        const liveLayers = storage.get("layers");
+        if (liveLayers.size >= MAX_LAYERS) return;
+        const liveLayerIds = storage.get("layerIds");
+        const id = nanoid();
+        const minX = Math.min(origin.x, end.x);
+        const minY = Math.min(origin.y, end.y);
+        const maxX = Math.max(origin.x, end.x);
+        const maxY = Math.max(origin.y, end.y);
+        liveLayers.set(id, new LiveObject({
+            type: LayerType.Line,
+            x: origin.x,
+            y: origin.y,
+            x2: end.x,
+            y2: end.y,
+            width: maxX - minX || 1,
+            height: maxY - minY || 1,
+            fill: lastUsedColor,
+            strokeWidth: 3,
+        }) as any);
+        liveLayerIds.push(id);
+    }, [lastUsedColor]);
+
+    // Erase any layer whose bounding box is within eraserSize of the pointer
+    const eraseLayerAt = useMutation(({storage}, point: Point, size: number) => {
+        const liveLayers = storage.get("layers");
+        const liveLayerIds = storage.get("layerIds");
+        const toDelete: string[] = [];
+        liveLayerIds.forEach((id: string) => {
+            const layer = liveLayers.get(id);
+            if (!layer) return;
+            const l = layer as any;
+            const lx = l.get ? l.get("x") : l.x;
+            const ly = l.get ? l.get("y") : l.y;
+            const lw = l.get ? l.get("width") : l.width;
+            const lh = l.get ? l.get("height") : l.height;
+            const lx2 = l.get ? l.get("x2") : l.x2;
+            const ly2 = l.get ? l.get("y2") : l.y2;
+
+            // For lines use midpoint, for others use bounding box center
+            const cx = lx2 !== undefined ? (lx + lx2) / 2 : lx + lw / 2;
+            const cy = ly2 !== undefined ? (ly + ly2) / 2 : ly + lh / 2;
+
+            const dist = Math.hypot(point.x - cx, point.y - cy);
+            const hitRadius = size + Math.max(lw || 0, lh || 0) / 2;
+            if (dist < hitRadius) toDelete.push(id);
+        });
+        toDelete.forEach(id => {
+            liveLayers.delete(id);
+            const idx = liveLayerIds.indexOf(id);
+            if (idx !== -1) liveLayerIds.delete(idx);
+        });
+    }, []);
+
     const resizeSelectedLayer = useMutation(({storage, self}, point: Point) => {
         if(canvasState.mode !== CanvasMode.Resizing) return;
 
@@ -242,10 +301,14 @@ export const Canvas = ({
             resizeSelectedLayer(current);
         } else if (canvasState.mode === CanvasMode.Pencil) {
             continueDrawing(current, e);
+        } else if (canvasState.mode === CanvasMode.Eraser && e.buttons === 1) {
+            eraseLayerAt(current, eraserSize);
+        } else if (canvasState.mode === CanvasMode.Line && e.buttons === 1) {
+            setLineCurrent(current);
         }
 
         setMyPresence({cursor: current});
-    }, [continueDrawing, startMultiSelection, updateSelectionNet, canvasState, resizeSelectedLayer, camera]);
+    }, [continueDrawing, startMultiSelection, updateSelectionNet, canvasState, resizeSelectedLayer, camera, eraserSize, eraseLayerAt]);
 
     const onPointerLeave = useMutation(({setMyPresence}) => {
         setMyPresence({cursor: null});
@@ -258,8 +321,14 @@ export const Canvas = ({
             startDrawing(point, e.pressure);
             return;
         }
+        if (canvasState.mode === CanvasMode.Line) {
+            setLineOrigin(point);
+            setLineCurrent(point);
+            return;
+        }
+        if (canvasState.mode === CanvasMode.Eraser) return;
         setCanvasState({origin: point, mode: CanvasMode.Pressing});
-    }, [camera, canvasState.mode]);
+    }, [camera, canvasState.mode, startDrawing]);
 
     const onPointerUp = useMutation((
         {}, 
@@ -267,21 +336,28 @@ export const Canvas = ({
     ) => {
         const point = pointerEventToCanvasPoint(e, camera);
 
-        if (canvasState.mode === CanvasMode.None || canvasState.mode === CanvasMode.Pressing) {
+        if (canvasState.mode === CanvasMode.Line && lineOrigin) {
+            insertLine(lineOrigin, point);
+            setLineOrigin(null);
+            setLineCurrent(null);
+        } else if (canvasState.mode === CanvasMode.None || canvasState.mode === CanvasMode.Pressing) {
             unselectLayers();
             setCanvasState({ mode: CanvasMode.None });
         } else if (canvasState.mode === CanvasMode.Pencil){
             insertPath();
         } else if (canvasState.mode === CanvasMode.Inserting){
-            insertLayer(canvasState.layerType, point);
+            insertLayer(canvasState.layerType as any, point);
+        } else if (canvasState.mode === CanvasMode.Eraser) {
+            // nothing — erasing happens on move
         } else {
             setCanvasState({ mode: CanvasMode.None });
         }
         history.resume();
-    }, [camera, canvasState, history, insertLayer, unselectLayers, insertPath]);
+    }, [camera, canvasState, history, insertLayer, insertLine, unselectLayers, insertPath, lineOrigin]);
 
     const onLayerPointerDown = useMutation(({self , setMyPresence}, e: React.PointerEvent, layerId: string) => {
-        if(canvasState.mode === CanvasMode.Pencil || canvasState.mode === CanvasMode.Inserting) return;
+        if(canvasState.mode === CanvasMode.Pencil || canvasState.mode === CanvasMode.Inserting
+           || canvasState.mode === CanvasMode.Eraser || canvasState.mode === CanvasMode.Line) return;
 
         history.pause();
         e.stopPropagation();
@@ -377,7 +453,7 @@ export const Canvas = ({
                 <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[1000] flex items-center justify-center px-4">
                     <div className="bg-slate-900/40 border border-white/10 rounded-full p-1.5 flex items-center shadow-2xl backdrop-blur-md transition-all">
                         <div className="px-3 flex items-center gap-2">
-                            <span className="text-amber-400 text-[13px] drop-shadow-sm">👁️</span>
+                            <Eye className="w-4 h-4 text-amber-400 drop-shadow-sm" />
                             <span className="text-slate-200 text-xs font-semibold tracking-wide">View Only</span>
                         </div>
                         
@@ -393,11 +469,16 @@ export const Canvas = ({
                                 ) : (
                                     <Button
                                         size="sm"
-                                        className="h-7 text-xs bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-900/20 text-white rounded-full px-4 font-semibold transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
+                                        className="h-7 text-xs bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-900/20 text-white rounded-full px-4 font-semibold transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100 flex items-center gap-1.5"
                                         onClick={handleRequestCollab}
                                         disabled={isRequesting || cooldown > 0}
                                     >
-                                        {isRequesting ? "Sending..." : cooldown > 0 ? `Wait ${cooldown}s to send again` : "Request to Collaborate ✨"}
+                                        {isRequesting ? "Sending..." : cooldown > 0 ? `Wait ${cooldown}s to send again` : (
+                                            <>
+                                                Request to Collaborate
+                                                <Send className="w-3 h-3 ml-0.5" />
+                                            </>
+                                        )}
                                     </Button>
                                 )}
                             </div>
@@ -415,6 +496,8 @@ export const Canvas = ({
                         canUndo={canUndo}
                         undo={history.undo}
                         redo={history.redo}
+                        eraserSize={eraserSize}
+                        setEraserSize={setEraserSize}
                     />
                     <SelectionTools camera={camera} setLastUsedColor={setLastUsedColor} />
                 </>
@@ -425,21 +508,21 @@ export const Canvas = ({
                 className="h-[100vh] w-[100vw]"
                 style={{ pointerEvents: isReadOnly ? "none" : "auto" }} // Disables clicking/editing but allows scrolling on main wrapper
                 onWheel={onWheel}
-                onPointerMove={!isReadOnly ? onPointerMove : undefined}
-                onPointerLeave={!isReadOnly ? onPointerLeave : undefined}
-                onPointerDown={!isReadOnly ? onPointerDown : undefined}
-                onPointerUp={!isReadOnly ? onPointerUp : undefined}
+                onPointerMove={!isReadOnly ? (e) => { try { onPointerMove(e) } catch {} } : undefined}
+                onPointerLeave={!isReadOnly ? () => { try { onPointerLeave() } catch {} } : undefined}
+                onPointerDown={!isReadOnly ? (e) => { try { onPointerDown(e) } catch {} } : undefined}
+                onPointerUp={!isReadOnly ? (e) => { try { onPointerUp(e) } catch {} } : undefined}
             >
                 <g style={{ transform: `translate(${camera.x}px, ${camera.y}px)` }}>
                     {layerIds?.map((layerId) => (
                         <LayerPreview 
                             key={layerId}
                             id={layerId}
-                            onLayerPointerDown={onLayerPointerDown}
+                            onLayerPointerDown={(e, id) => { try { onLayerPointerDown(e, id) } catch {} }}
                             selectionColor={layerIdsToColorSelection[layerId]}
                         />
                     ))}
-                    <SelectionBox onResizeHandlePointerDown={onResizeHandlePointerDown} />
+                    <SelectionBox onResizeHandlePointerDown={(side, bounds) => { try { onResizeHandlePointerDown(side, bounds) } catch {} }} />
                     {canvasState.mode === CanvasMode.SelectionNet && canvasState.current != null && (
                         <rect 
                             className="fill-indigo-500/5 stroke-indigo-500 stroke-1"
@@ -455,6 +538,21 @@ export const Canvas = ({
                             points={pencilDraft}
                             fill={colorToCss(lastUsedColor)}
                             x={0} y={0}
+                        />
+                    )}
+                    {/* Line tool preview — dashed line shown while dragging */}
+                    {canvasState.mode === CanvasMode.Line && lineOrigin && lineCurrent && (
+                        <line
+                            x1={lineOrigin.x}
+                            y1={lineOrigin.y}
+                            x2={lineCurrent.x}
+                            y2={lineCurrent.y}
+                            stroke={colorToCss(lastUsedColor)}
+                            strokeWidth={3}
+                            strokeLinecap="round"
+                            strokeDasharray="8 4"
+                            opacity={0.75}
+                            style={{ pointerEvents: "none" }}
                         />
                     )}
                 </g>

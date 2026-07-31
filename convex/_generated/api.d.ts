@@ -11,6 +11,7 @@
 import type * as board from "../board.js";
 import type * as boards from "../boards.js";
 import type * as requests from "../requests.js";
+import type * as roleUpdates from "../roleUpdates.js";
 
 import type {
   ApiFromModules,
@@ -22,6 +23,7 @@ declare const fullApi: ApiFromModules<{
   board: typeof board;
   boards: typeof boards;
   requests: typeof requests;
+  roleUpdates: typeof roleUpdates;
 }>;
 
 /**
