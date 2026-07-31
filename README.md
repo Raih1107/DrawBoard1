@@ -11,7 +11,7 @@ The entire canvas state is backed by a Conflict-free Replicated Data Type (CRDT)
 Here is how the application looks in action:
 
 **The Dashboard:**
-![Dashboard](public/screenshots/dashboard.png)
+![Dashboard](public/screenshots/dashboard1.png)
 
 **The Real-time Canvas:**
 ![Real-time Canvas](public/screenshots/canvas.png)
