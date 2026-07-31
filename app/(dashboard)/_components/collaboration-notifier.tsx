@@ -99,7 +99,7 @@ export const CollaborationNotifier = () => {
                                     toast.warning(`Added to org (Clerk note: ${res.error})`, { duration: 5000 });
                                 } else {
                                     await updateStatus({ id: req._id, status: "approved" });
-                                    toast.success(`✅ ${req.requesterName} can now collaborate!`, { duration: 4000 });
+                                    toast.success(`${req.requesterName} can now collaborate!`, { duration: 4000 });
                                 }
                             }}
                         >
@@ -110,7 +110,7 @@ export const CollaborationNotifier = () => {
                 </div>
             ), {
                 id: req._id,
-                duration: 60000,
+                duration: 10000,
             });
         });
     // Re-run any time the pendingRequests array changes (new entries added in real-time by Convex)
