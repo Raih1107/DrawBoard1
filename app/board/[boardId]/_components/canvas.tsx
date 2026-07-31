@@ -114,11 +114,19 @@ export const Canvas = ({
             const layer = liveLayers.get(id);
 
             if(layer) {
-                // Cast layer to any to allow dynamic access to .get("x")
-                layer.update({
-                    x: (layer as any).get("x") + offset.x,
-                    y: (layer as any).get("y") + offset.y,
-                });
+                if ((layer as any).get("type") === LayerType.Line) {
+                    layer.update({
+                        x: (layer as any).get("x") + offset.x,
+                        y: (layer as any).get("y") + offset.y,
+                        x2: (layer as any).get("x2") + offset.x,
+                        y2: (layer as any).get("y2") + offset.y,
+                    });
+                } else {
+                    layer.update({
+                        x: (layer as any).get("x") + offset.x,
+                        y: (layer as any).get("y") + offset.y,
+                    });
+                }
             }
         }
         setCanvasState({mode: CanvasMode.Translating, current: point});
