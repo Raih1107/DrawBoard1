@@ -34,7 +34,6 @@ Multiple users draw on the same infinite canvas simultaneously — shapes, freeh
 - Boards are **multi-tenant**, scoped to Clerk organizations — a board belongs to an org, never to a single user
 - Board access is **server-brokered**: the Liveblocks token is only minted after verifying the user's Clerk session server-side — guessing a board ID is not enough to join its room
 - **Collaboration Requests** — guests can request access to any public board; org admins approve/reject/block in real time
-- Admin-promoted members get an **instant toast notification** via a Convex WebSocket push, and their Clerk session JWT is reloaded client-side to immediately reflect the new role
 - **Sole Admin Protection** — a sticky dashboard banner prevents the last admin from leaving an org without promoting another member first
 
 ### Dashboard
